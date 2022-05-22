@@ -13,9 +13,6 @@ s warmsensor On 1
 s warmpumpin Setting 1
 s warmpumpout Setting 100
 
-waittoreset:
-sleep 5
-
 reset:
 s warmpumpin On 0
 s warmpumpout On 1
@@ -28,9 +25,10 @@ l r0 warmsensor Pressure
 bnez r0 waitforreset
 s warmpumpout On 0
 
-# reset if cool is warm enough
+waitforwork:
+yield
 l r0 coolsensor Temperature
-bge r0 TARGET waittoreset
+bge r0 TARGET waitforwork
 
 warmfill:
 s warmpumpin On 1
