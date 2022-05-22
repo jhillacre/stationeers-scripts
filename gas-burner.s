@@ -9,6 +9,8 @@ define FuelFillPressure 1000
 define MaxExhaustPressure 10000
 
 init:
+s fuelsensor On 1
+s exhaustsensor On 1
 s exhaustpump On 0
 s exhaustpump Setting 100
 s fuelpump On 0
