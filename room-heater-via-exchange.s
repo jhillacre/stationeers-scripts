@@ -3,7 +3,8 @@ alias warmpumpin d1
 alias warmpumpout d2
 alias warmsensor d3
 
-define TARGET 293.15
+define TARGET 294.15
+define TOOCOOL 293.15
 define SAMPLEPRESSURE 1000
 define MAXWARMPRESSURE 5000
 
@@ -28,7 +29,7 @@ s warmpumpout On 0
 waitforwork:
 yield
 l r0 coolsensor Temperature
-bge r0 TARGET waitforwork
+bge r0 TOOCOOL waitforwork
 
 warmfill:
 s warmpumpin On 1
