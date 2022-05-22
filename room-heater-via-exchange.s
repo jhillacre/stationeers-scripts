@@ -50,9 +50,10 @@ l r0 coolsensor Temperature
 bge r0 TARGET reset
 
 warmfill:
-# overtarget Temperature by how cool it is, we likely aren't heating the whole room at once.
+# overtarget Temperature by how cool it is, we
+# likely aren't heating the whole room at once.
 l r0 coolsensor Temperature
-sub TARGET r0 r1
+sub r1 TARGET r0
 add r1 TARGET r1
 s coolpumpin On 0
 s coolpumpout On 0
