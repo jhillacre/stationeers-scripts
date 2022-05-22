@@ -27,7 +27,7 @@ bnez r0 waitforreset
 s warmpumpout On 0
 
 waitforwork:
-yield
+sleep 5
 l r0 coolsensor Temperature
 bge r0 TOOCOOL waitforwork
 
