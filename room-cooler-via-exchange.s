@@ -50,8 +50,8 @@ l r0 warmsensor Temperature
 ble r0 TARGET reset
 
 coolfill:
-# overtarget Temperature by how warm it is
-# we likely aren't cooling the whole room at once.
+# overtarget Temperature by how warm it is, we
+# likely aren't cooling the whole room at once.
 l r0 coolsensor Temperature
 sub r1 r0 TARGET
 sub r1 TARGET r1
@@ -65,5 +65,5 @@ yield
 l r0 coolsensor Pressure
 bge r0 MAXCOOLPRESSURE reset
 l r0 coolsensor Temperature
-bgt r0 TARGET waitforcoolfill
+bgt r0 r1 waitforcoolfill
 j reset
