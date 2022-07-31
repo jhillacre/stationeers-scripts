@@ -8,11 +8,11 @@ alias o2pump d4
 alias switch d5
 alias PUMPMAX r10
 
-define MAXPRESSURE 1000
+define MAXPRESSURE 10000
 define H2RATIO 0.666666
 define O2RATIO 0.333333
-define OVERCORRECT 5
-define MAXPUMP 20
+define OVERCORRECT 50
+define MAXPUMP 100
 
 init:
 s fuelsensor On 1
@@ -28,6 +28,12 @@ bdns h2pump init
 bdns o2pump init
 bdns switch init
 
+
+# if the lines are mixed, don't mix.
+l r2 h2sensor RatioVolatiles
+blt r2 1 start
+l r3 o2sensor RatioOxygen
+blt r3 1 start
 # is the tank isnt mixed correctly, fix it.
 l r0 fuelsensor Pressure
 beqz r0 nopressure
