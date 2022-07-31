@@ -8,11 +8,11 @@ alias o2pump d4
 alias switch d5
 alias PUMPMAX r10
 
-define MAXPRESSURE 10000
+define MAXPRESSURE 1000
 define H2RATIO 0.666666
 define O2RATIO 0.333333
-define OVERCORRECT 50
-define MAXPUMP 100
+define OVERCORRECT 5
+define MAXPUMP 20
 
 init:
 s fuelsensor On 1
