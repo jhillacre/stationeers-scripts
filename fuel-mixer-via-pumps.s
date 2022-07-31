@@ -28,12 +28,6 @@ bdns h2pump init
 bdns o2pump init
 bdns switch init
 
-
-# if the lines are mixed, don't mix.
-l r2 h2sensor RatioVolatiles
-blt r2 1 start
-l r3 o2sensor RatioOxygen
-blt r3 1 start
 # is the tank isnt mixed correctly, fix it.
 l r0 fuelsensor Pressure
 beqz r0 nopressure
@@ -75,11 +69,19 @@ s o2pump Setting r0
 
 l r0 switch Open
 # go, no go
-brnez r0 4
+beqz r0 turnoff
+# if the lines are mixed, don't mix.
+l r2 h2sensor RatioVolatiles
+blt r2 1 turnoff
+l r3 o2sensor RatioOxygen
+blt r3 1 turnoff
+j setpumps
+turnoff:
 s h2pump On 0
 s o2pump On 0
 j start
 
+setpumps:
 # turn off if we are full
 l r0 fuelsensor Pressure
 slt r0 r0 MAXPRESSURE
