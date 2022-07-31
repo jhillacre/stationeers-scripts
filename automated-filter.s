@@ -1,6 +1,8 @@
-alias filtration d0 # atmospheris filter
-alias unfiltered d1 # pipe analyzer
-alias filtered d2 # pipe analyzer
+alias filtration d0 # atmospheric filter
+alias wastesensor d1
+alias storagesensor d2
+alias light d3 # attention getter
+alias alarm d4 # attention getter
 
 alias unfilteredPressure r7
 alias filteredPressure r8
@@ -11,10 +13,19 @@ alias overPressure r12
 alias alarmOn r13
 alias filtrationOn r14
 
-define LightHash -1535893860
-define AlarmHash -828056979
 define RatioMax 0 # leave under this ratio in the unfiltered side
 define PressureMax 18000 # fill filtered side up to this amount
+
+init:
+bdns filtration init
+bdns wastesensor init
+bdns storagesensor init
+bdns light init
+bdns alarm init
+s light On 1
+s alarm On 1
+s filtration On 1
+sleep 3.5
 
 main:
 jal load
@@ -22,15 +33,15 @@ slez r0 unfilteredRatio
 nor filtrationOn r0 overPressure
 s filtration On filtrationOn
 or alarmOn badFilter overPressure
-sb LightHash On alarmOn
-sb AlarmHash On alarmOn
+s light On alarmOn
+s alarm On alarmOn
 s db Setting alarmOn
 yield
 j main
 
 load:
-l unfilteredPressure unfiltered Pressure
-l filteredPressure filtered Pressure
+l unfilteredPressure wastesensor Pressure
+l filteredPressure storagesensor Pressure
 sge overPressure filteredPressure PressureMax
 move badFilter 0
 move unfilteredRatio 0
@@ -72,20 +83,20 @@ setBadFilter:
 move badFilter 1
 j ra
 checkNitrogen:
-l unfilteredRatio unfiltered RatioNitrogen
+l unfilteredRatio wastesensor RatioNitrogen
 j ra
 checkOxygen:
-l unfilteredRatio unfiltered RatioOxygen
+l unfilteredRatio wastesensor RatioOxygen
 j ra
 checkVolatiles:
-l unfilteredRatio unfiltered RatioVolatiles
+l unfilteredRatio wastesensor RatioVolatiles
 j ra
 checkCarbonDioxide:
-l unfilteredRatio unfiltered RatioCarbonDioxide
+l unfilteredRatio wastesensor RatioCarbonDioxide
 j ra
 checkNitrous:
-l unfilteredRatio unfiltered RatioNitrousOxide
+l unfilteredRatio wastesensor RatioNitrousOxide
 j ra
 checkPollutants:
-l unfilteredRatio unfiltered RatioPollutant
+l unfilteredRatio wastesensor RatioPollutant
 j ra
