@@ -3,6 +3,7 @@ alias wastesensor d1
 alias storagesensor d2
 alias light d3 # attention getter
 alias alarm d4 # attention getter
+alias emgvent d5 # emergency active vent
 
 alias unfilteredPressure r7
 alias filteredPressure r8
@@ -14,7 +15,7 @@ alias alarmOn r13
 alias filtrationOn r14
 
 define RatioMax 0 # leave under this ratio in the unfiltered side
-define PressureMax 18000 # fill filtered side up to this amount
+define PressureMax 39000 # fill filtered side up to this amount
 
 init:
 bdns filtration init
@@ -25,6 +26,11 @@ bdns alarm init
 s light On 1
 s alarm On 1
 s filtration On 1
+s emgvent On 0
+s emgvent Mode 0
+s emgvent PressureExternal 99999
+s emgvent PressureInternal 39000
+s emgvent Lock 1
 sleep 3.5
 
 main:
@@ -33,6 +39,7 @@ slez r0 unfilteredRatio
 nor filtrationOn r0 overPressure
 s filtration On filtrationOn
 or alarmOn badFilter overPressure
+s emgvent On overPressure
 s light On alarmOn
 s alarm On alarmOn
 s db Setting alarmOn
