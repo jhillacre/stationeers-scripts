@@ -15,7 +15,8 @@ alias alarmOn r13
 alias filtrationOn r14
 
 define RatioMax 0 # leave under this ratio in the unfiltered side
-define PressureMax 39000 # fill filtered side up to this amount
+define PressureMax 39000 # fill filtered side up to
+define VentTo 38000 # Bigger number for less constant alarm...
 
 init:
 bdns filtration init
@@ -29,7 +30,7 @@ s filtration On 1
 s emgvent On 0
 s emgvent Mode 0
 s emgvent PressureExternal 99999
-s emgvent PressureInternal 39000
+s emgvent PressureInternal VentTo
 s emgvent Lock 1
 sleep 3.5
 
