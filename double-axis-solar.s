@@ -1,5 +1,3 @@
-alias sensor d0
-
 alias daylight r0
 alias horiangle r1
 alias vertangle r2
@@ -17,6 +15,7 @@ define heavy -934345724
 define heavydual -1545574413
 define normal -2045627372
 define normaldual -539224550
+define daylightsensor 1076425094
 
 init:
 move state 6
@@ -101,9 +100,9 @@ sub state state 1
 j returnToMain
 
 loadDevices:
-l daylight sensor Activate
-l horiangle sensor Horizontal
-l vertangle sensor Vertical
+lb daylight daylightsensor Activate 3
+lb horiangle daylightsensor Horizontal 3
+lb vertangle daylightsensor Vertical 3
 j ra
 
 setDevices:
