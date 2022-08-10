@@ -11,8 +11,8 @@ alias PUMPMAX r10
 define MAXPRESSURE 1000
 define H2RATIO 0.666666
 define O2RATIO 0.333333
-define OVERCORRECT 5
-define MAXPUMP 20
+define OVERCORRECT 10
+define MAXPUMP 100
 
 init:
 s fuelsensor On 1
