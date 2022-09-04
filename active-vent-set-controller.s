@@ -15,6 +15,7 @@ define INTAKEEXT 3
 define INTAKEINT 4
 define OFFEXT 5
 define OFFINT 6
+define OFFALL 7
 
 define ACTIVEVENT -1129453144
 define RespondToInternal 0
@@ -36,6 +37,7 @@ l r0 ventCommand Setting
 beq r0 doExhaust exhaust
 beq r0 doIntake intake
 beq r0 doOff off
+beq r0 OFFALL off
 j main
 
 exhaust:
