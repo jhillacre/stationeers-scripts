@@ -1,6 +1,10 @@
-# open or close all network airgates depending on a door command setting
-# RespondToInternal should be changed if this airgate set is considered internal or external.
-# intended use would have a memory / ic housing mirrored from a controlling network that wants to command two sets of multiple airgates.
+# open or close all network airgates depending on a
+#  door command setting
+# RespondToInternal should be changed if this airgate
+#  set is considered internal or external.
+# intended use would have a memory / ic housing
+#  mirrored from a controlling network that wants
+#  to command two sets of multiple airgates.
 alias doorCommand d0
 
 define CLEAR 0
