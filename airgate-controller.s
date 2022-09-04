@@ -14,7 +14,6 @@ define CLOSEALL 6
 define AIRGATE 1736080881
 define RespondToInternal 1
 define CLEARCMDSLEEP 0.5
-define MAINSLEEP 1
 
 alias doorHash r7
 alias doOpen r8
@@ -30,7 +29,7 @@ select doClose RespondToInternal CLOSEINT CLOSEEXT
 move doCloseAll CLOSEALL
 
 main:
-sleep MAINSLEEP
+yield
 l r0 doorCommand Setting
 beq r0 doOpen open
 beq r0 doOpenAll open
