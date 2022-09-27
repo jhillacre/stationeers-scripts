@@ -1,0 +1,24 @@
+alias HotValve d0
+alias ColdValve d1
+
+define HOTTARGET 313.15
+define COLDTARGET 293.15
+define WARMTARGET 303.15
+define GASSENSORHASH -1252983604
+
+loop:
+yield
+l r0 HotValve On
+l r1 ColdValve On
+lb r2 GASSENSORHASH Temperature 0
+openhot:
+bge r2 COLDTARGET opencold
+s HotValve On 1
+sleep 5
+s HotValve On 0
+opencold:
+ble r2 HOTTARGET loop
+s ColdValve On 1
+sleep 5
+s ColdValve On 0
+j loop
