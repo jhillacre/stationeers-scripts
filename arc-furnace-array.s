@@ -1,35 +1,41 @@
-# turn on and activate arc furances that have work.
+# turn on and activate arc furnaces that have work.
 alias ArcFurnace1 d0
 alias ArcFurnace2 d1
 alias ArcFurnace3 d2
 alias ArcFurnace4 d3
 alias ArcFurnace5 d4
 alias ArcFurnace6 d5
+alias WaitingOres r1
+alias IsIdle r2
+alias IsEveryLeverOn r3
+
+define LeverHash 1220484876
 
 init:
 move r0 0
-s db Setting r0
+lb IsEveryLeverOn LeverHash Open 2
 
 loop:
 yield
+# skip checking work if the device is not configured
+bdns dr0 incrementLoop
+jal checkWork
 
-bdns dr0 inc
-jal check
-inc:
+incrementLoop:
 add r0 r0 1
-s db Setting r0
 beq r0 6 init
 j loop
 
-
-check:
-l r2 dr0 Idle
-ls r1 dr0 0 Quantity
-blez r1 deactivate
-blez r2 ra
+checkWork:
+l IsIdle dr0 Idle
+ls WaitingOres dr0 0 Quantity
+beqz IsEveryLeverOn deactivateOne
+blez WaitingOres deactivateOne
+blez IsIdle ra
 s dr0 On 1
 s dr0 Activate 1
 j ra
-deactivate:
+
+deactivateOne:
 s dr0 On 0
 j ra
