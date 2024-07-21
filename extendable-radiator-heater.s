@@ -1,24 +1,43 @@
-# assuming base of rad and sensor are north.
 define EXTRADHASH -566775170
 define DAYLIGHTHASH 1076425094
 
+alias daylightActive r0
+alias radiatorOpen r1
+alias verticalAngle r2
+alias horizontalAngle r3
+alias adjustedAngle r4
+alias doCooling r5
+
+init:
+move doCooling 0 # Change this to 1 for cooling.
+
 loop:
 yield
-lb r0 DAYLIGHTHASH Activate 3
-lb r1 EXTRADHASH Open 3
-lb r2 DAYLIGHTHASH Vertical 3
-lb r3 DAYLIGHTHASH Horizontal 3
-bgtz r0 day
-move r4 90
+
+lb daylightActive DAYLIGHTHASH Activate 3
+lb radiatorOpen EXTRADHASH Open 3
+lb verticalAngle DAYLIGHTHASH Vertical 3
+lb horizontalAngle DAYLIGHTHASH Horizontal 3
+
+bgtz daylightActive day
+
+night:
+# park angle
+move adjustedAngle -45
+sb EXTRADHASH Open doCooling
 j continue
+
 day:
-sgtz r4 r3
-mul r4 r4 -360
-add r4 r4 r2
-abs r4 r4
+# account for positive/negative angle so the radiator
+# doesn't waste time doing a full-turn on a sign change.
+sltz adjustedAngle r3
+mul adjustedAngle adjustedAngle -360
+add adjustedAngle adjustedAngle verticalAngle
+abs adjustedAngle adjustedAngle
+beq daylightActive radiatorOpen continue
+sb EXTRADHASH Open 1
+
 continue:
-sb EXTRADHASH Horizontal r4
-s db Setting r4
-beq r0 r1 loop
-sb EXTRADHASH Open r0
+sb EXTRADHASH Horizontal adjustedAngle
+s db Setting adjustedAngle
 j loop
