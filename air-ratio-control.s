@@ -1,8 +1,9 @@
+# Manage Gas Ratio via Pumps
 alias CO2Pump d0
 alias N2Pump d1
 alias O2Pump d2
 
-define GASSENSORHASH -1252983604
+define GASSENSORHASH HASH("StructureGasSensor")
 define TARGETCO2 0.01
 define TARGETN2 0.69
 define TARGETO2 0.30
