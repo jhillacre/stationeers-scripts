@@ -9,7 +9,7 @@ alias WaitingOres r1
 alias IsIdle r2
 alias IsEveryLeverOn r3
 
-define LeverHash 1220484876
+define LeverHash HASH("StructureLogicSwitch")
 
 init:
 move r0 0
