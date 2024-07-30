@@ -44,7 +44,7 @@ l O2PumpMax O2Pump Maximum
 l ExhaustPumpMax ExhaustPump Maximum
 s ExhaustActiveVent Mode 1
 s ExhaustActiveVent On 0
-s ExhaustActiveVent Lock 1
+s ExhaustActiveVent Lock 0
 
 loop:
 yield
@@ -60,8 +60,8 @@ move N2PumpSetting 0
 move O2PumpSetting 0
 s ExhaustActiveVent On 1
 j setPumps
-s ExhaustActiveVent On 0
 underPressure:
+s ExhaustActiveVent On 0
 bgt RoomPressure PRESSUREMIN inRange
 # under 101 kPa
 move ExhaustPumpSetting 0
