@@ -3,6 +3,7 @@ alias CO2Pump d0
 alias N2Pump d1
 alias O2Pump d2
 alias ExhaustPump d3
+alias ExhaustActiveVent d4
 
 define GASSENSORHASH HASH("StructureGasSensor")
 define TARGETCO2 0.01
@@ -23,11 +24,12 @@ alias CO2PumpMax r8
 alias N2PumpMax r9
 alias O2PumpMax r10
 alias ExhaustPumpMax r11
-# scalePump args
+# pumpSettingPD args
 alias MaxPumpSetting r12
 alias CurrentRatio r13
 alias TargetRatio r14
 alias ScaledSetting r15
+alias LastError r16 # !!!
 
 init:
 yield
@@ -35,10 +37,14 @@ bdns CO2Pump init
 bdns N2Pump init
 bdns O2Pump init
 bdns ExhaustPump init
+bdns ExhaustActiveVent init
 l CO2PumpMax CO2Pump Maximum
 l N2PumpMax N2Pump Maximum
 l O2PumpMax O2Pump Maximum
 l ExhaustPumpMax ExhaustPump Maximum
+s ExhaustActiveVent Mode 1
+s ExhaustActiveVent On 0
+s ExhaustActiveVent Lock 1
 
 loop:
 yield
@@ -52,8 +58,9 @@ move ExhaustPumpSetting ExhaustPumpMax
 move CO2PumpSetting 0
 move N2PumpSetting 0
 move O2PumpSetting 0
+s ExhaustActiveVent On 1
 j setPumps
-
+s ExhaustActiveVent On 0
 underPressure:
 bgt RoomPressure PRESSUREMIN inRange
 # under 101 kPa
@@ -67,25 +74,25 @@ inRange:
 move MaxPumpSetting CO2PumpMax
 move CurrentRatio CO2Ratio
 move TargetRatio TARGETCO2
-jal scalePump
+jal pumpSettingPD
 move CO2PumpSetting ScaledSetting
 
 move MaxPumpSetting N2PumpMax
 move CurrentRatio N2Ratio
 move TargetRatio TARGETN2
-jal scalePump
+jal pumpSettingPD
 move N2PumpSetting ScaledSetting
 
 move MaxPumpSetting O2PumpMax
 move CurrentRatio O2Ratio
 move TargetRatio TARGETO2
-jal scalePump
+jal pumpSettingPD
 move O2PumpSetting ScaledSetting
 
 move MaxPumpSetting ExhaustPumpMax
 move CurrentRatio RoomPressure
 move TargetRatio PRESSURETARGET
-jal scalePump
+jal pumpSettingPD
 move ExhaustPumpSetting ScaledSetting
 
 setPumps:
@@ -101,16 +108,20 @@ s O2Pump Setting O2PumpSetting
 snez r15 O2PumpSetting
 s O2Pump On r15
 
-s ExhaustPump On ExhaustPumpSetting
+s ExhaustPump Setting ExhaustPumpSetting
 snez r15 ExhaustPumpSetting
 s ExhaustPump On r15
 j loop
 
-scalePump:
-sub ScaledSetting TargetRatio CurrentRatio
-abs ScaledSetting ScaledSetting
-mul ScaledSetting ScaledSetting ScaledSetting
-mul ScaledSetting ScaledSetting MaxPumpSetting
-mul ScaledSetting ScaledSetting 0.8
-add ScaledSetting ScaledSetting MaxPumpSetting
+pumpSettingPD: # use r13 / r14 for internal math after getting their value
+sub r13 TargetRatio CurrentRatio # error
+sub r14 r13 LastError # derivative
+mul r13 r13 100 # p gain
+mul r14 r14 10 # d gain
+add ScaledSetting r13 r14
+move LastError r13
+mul ScaledSetting ScaledSetting 100 # <0.01 = 0
+round ScaledSetting ScaledSetting
+div ScaledSetting ScaledSetting 100
+max ScaledSetting ScaledSetting 0
 j ra
