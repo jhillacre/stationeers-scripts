@@ -31,10 +31,11 @@ bdns CO2Pump init
 bdns N2Pump init
 bdns O2Pump init
 bdns ExhaustPump init
-bdns ExhaustActiveVent init
+bdns ExhaustActiveVent continueInit
 s ExhaustActiveVent Mode 1
 s ExhaustActiveVent On 0
 s ExhaustActiveVent Lock 0
+continueInit:
 push 0
 brlt sp 4 -1
 loop:
@@ -48,10 +49,13 @@ move ExhaustPumpSetting 100 # above 149 kPa
 move CO2PumpSetting 0
 move N2PumpSetting 0
 move O2PumpSetting 0
+bdns ExhaustActiveVent setPumps
 s ExhaustActiveVent On 1
 j setPumps
 underPressure:
+bdns ExhaustActiveVent continueUnderPressure
 s ExhaustActiveVent On 0
+continueUnderPressure:
 bgt RoomPressure PRESSUREMIN inRange
 move ExhaustPumpSetting 0 # under 101 kPa
 move CO2PumpSetting 0
@@ -74,8 +78,8 @@ move TargetRatio TARGETO2
 move sp 3
 jal pumpSettingPD
 move O2PumpSetting ScaledSetting
-move CurrentRatio RoomPressure
-move TargetRatio PRESSURETARGET
+div CurrentRatio RoomPressure PRESSURETARGET
+move TargetRatio 1
 move sp 4
 jal pumpSettingPD
 move ExhaustPumpSetting ScaledSetting
@@ -97,8 +101,8 @@ pumpSettingPD:
 pop LastError
 sub CurrError TargetRatio CurrentRatio
 sub Derivative CurrError LastError
-mul Proportional CurrError 100 # p gain
-mul Derivative Derivative 10 # d gain
+mul Proportional CurrError 10 # p gain
+mul Derivative Derivative 2 # d gain
 add ScaledSetting Proportional Derivative
 push CurrError # update last error
 mul ScaledSetting ScaledSetting 1000 # <0.001 = 0
