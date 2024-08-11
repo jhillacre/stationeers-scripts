@@ -1,20 +1,21 @@
 # Manage Room Gas Ratio via Pumps
 alias CO2Pump d0
-alias N2Pump d1
+alias NPump d1
 alias O2Pump d2
 alias ExhaustPump d3
 alias ExhaustActiveVent d4
+alias RoomPipeAnalysizer d5
 define GASSENSORHASH HASH("StructureGasSensor")
 define TARGETCO2 0.01
-define TARGETN2 0.69
+define TARGETN 0.69
 define TARGETO2 0.30
 define PRESSURETARGET 149
 define PRESSUREMIN 101
 alias CO2Ratio r0
-alias N2Ratio r1
+alias NRatio r1
 alias O2Ratio r2
 alias CO2PumpSetting r3
-alias N2PumpSetting r4
+alias NPumpSetting r4
 alias O2PumpSetting r5
 alias ExhaustPumpSetting r6
 alias RoomPressure r7
@@ -28,7 +29,7 @@ alias ScaledSetting r15# pumpSettingPD return
 init:
 yield
 bdns CO2Pump init
-bdns N2Pump init
+bdns NPump init
 bdns O2Pump init
 bdns ExhaustPump init
 bdns ExhaustActiveVent continueInit
@@ -40,14 +41,22 @@ push 0
 brlt sp 4 -1
 loop:
 yield
+bdns RoomPipeAnalysizer useGasSensor
+l CO2Ratio RoomPipeAnalysizer RatioCarbonDioxide
+l NRatio RoomPipeAnalysizer RatioNitrogen
+l O2Ratio RoomPipeAnalysizer RatioOxygen
+l RoomPressure RoomPipeAnalysizer Pressure
+j continueLoop
+useGasSensor:
 lb CO2Ratio GASSENSORHASH RatioCarbonDioxide 0
-lb N2Ratio GASSENSORHASH RatioNitrogen 0
+lb NRatio GASSENSORHASH RatioNitrogen 0
 lb O2Ratio GASSENSORHASH RatioOxygen 0
 lb RoomPressure GASSENSORHASH Pressure 0
+continueLoop:
 blt RoomPressure PRESSURETARGET underPressure
 move ExhaustPumpSetting 100 # above 149 kPa
 move CO2PumpSetting 0
-move N2PumpSetting 0
+move NPumpSetting 0
 move O2PumpSetting 0
 bdns ExhaustActiveVent setPumps
 s ExhaustActiveVent On 1
@@ -59,7 +68,7 @@ continueUnderPressure:
 bgt RoomPressure PRESSUREMIN inRange
 move ExhaustPumpSetting 0 # under 101 kPa
 move CO2PumpSetting 0
-move N2PumpSetting 100
+move NPumpSetting 100
 move O2PumpSetting 100
 j setPumps
 inRange:
@@ -68,11 +77,11 @@ move TargetRatio TARGETCO2
 move sp 1
 jal pumpSettingPD
 move CO2PumpSetting ScaledSetting
-move CurrentRatio N2Ratio
-move TargetRatio TARGETN2
+move CurrentRatio NRatio
+move TargetRatio TARGETN
 move sp 2
 jal pumpSettingPD
-move N2PumpSetting ScaledSetting
+move NPumpSetting ScaledSetting
 move CurrentRatio O2Ratio
 move TargetRatio TARGETO2
 move sp 3
@@ -87,9 +96,9 @@ setPumps:
 s CO2Pump Setting CO2PumpSetting
 snez r15 CO2PumpSetting
 s CO2Pump On r15
-s N2Pump Setting N2PumpSetting
-snez r15 N2PumpSetting
-s N2Pump On r15
+s NPump Setting NPumpSetting
+snez r15 NPumpSetting
+s NPump On r15
 s O2Pump Setting O2PumpSetting
 snez r15 O2PumpSetting
 s O2Pump On r15
