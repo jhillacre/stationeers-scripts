@@ -1,104 +1,110 @@
-alias alarm d0 # attention getter
-alias emgvent d1 # emergency active vent
-
-alias unfilteredPressure r7
-alias filteredPressure r8
-alias unfilteredRatio r9
-alias filterNumber r10
-alias badFilter r11
-alias overPressure r12
-alias alarmOn r13
-alias filtrationOn r14
-alias venting r15
-
-define RatioMax 0 # leave under this ratio in the unfiltered side
-define PressureMax 39000 # fill filtered side up to
-define VentTo 38500 # Bigger number for less constant alarm...
-
+# manage a filtration unit via onboard chip slot
+# stop filtering if pressure is below target
+#  or if both slots are empty or not good
+# start filtering if gas is present that is
+#  our target gas and we have filters to use
+alias Self db
+define FILTERS_EACH 4
+define PRESSURE_TARGET 40000
+alias ReturnValue r15
+alias MaxSP r10
+alias SlotNum r9
+alias SlotZeroStatus r8
+alias SlotOneStatus r7
 init:
-bdns alarm init
-s alarm On 1
-s db Setting 1
-s emgvent On 0
-s emgvent Mode 0
-s emgvent PressureExternal 99999
-s emgvent PressureInternal VentTo
-s emgvent Lock 1
-move venting 0
-sleep 3.5
+push HASH("ItemGasFilterCarbonDioxide")
+push HASH("ItemGasFilterCarbonDioxideM")
+push HASH("ItemGasFilterCarbonDioxideL")
+push HASH("ItemGasFilterCarbonDioxideInfinite")
+push LogicType.RatioCarbonDioxideInput
+push HASH("ItemGasFilterNitrogen")
+push HASH("ItemGasFilterNitrogenM")
+push HASH("ItemGasFilterNitrogenL")
+push HASH("ItemGasFilterNitrogenInfinite")
+push LogicType.RatioNitrogenInput
+push HASH("ItemGasFilterOxygen")
+push HASH("ItemGasFilterOxygenM")
+push HASH("ItemGasFilterOxygenL")
+push HASH("ItemGasFilterOxygenInfinite")
+push LogicType.RatioOxygenInput
+push HASH("ItemGasFilterPollutant")
+push HASH("ItemGasFilterPollutantM")
+push HASH("ItemGasFilterPollutantL")
+push HASH("ItemGasFilterPollutantInfinite")
+push LogicType.RatioPollutantInput
+push HASH("ItemGasFilterVolatiles")
+push HASH("ItemGasFilterVolatilesM")
+push HASH("ItemGasFilterVolatilesL")
+push HASH("ItemGasFilterVolatilesInfinite")
+push LogicType.RatioVolatilesInput
+push HASH("ItemGasFilterWater")
+push HASH("ItemGasFilterWaterM")
+push HASH("ItemGasFilterWaterL")
+push HASH("ItemGasFilterWaterInfinite")
+push LogicType.RatioSteamInput
+push HASH("ItemGasFilterNitrousOxide")
+push HASH("ItemGasFilterNitrousOxideM")
+push HASH("ItemGasFilterNitrousOxideL")
+push HASH("ItemGasFilterNitrousOxideInfinite")
+push LogicType.RatioNitrousOxideInput
+move MaxSP sp
+s Self Mode 0
 
-main:
-jal load
-slez r0 unfilteredRatio
-nor filtrationOn r0 overPressure
-s db Setting filtrationOn
-or alarmOn badFilter overPressure
-s emgvent On venting
-s alarm On alarmOn
+loop:
 yield
-j main
+l r0 Self PressureOutput
+l r1 Self PressureOutput2
+bgt r0 PRESSURE_TARGET stopFiltering
+bgt r1 PRESSURE_TARGET stopFiltering
+move SlotNum 0
+jal checkFilterSlot
+move SlotZeroStatus ReturnValue
+move SlotNum 1
+jal checkFilterSlot
+move SlotOneStatus ReturnValue
+seq r0 SlotZeroStatus SlotOneStatus # both are equal
+seq r1 SlotZeroStatus -1 # slot 0 is empty
+seq r2 SlotOneStatus -1 # slot 1 is empty
+seq r3 r1 r2 # both are empty
+seqz r4 SlotZeroStatus # slot 0 is not good
+seqz r5 SlotOneStatus # slot 1 is not good
+or r6 r4 r5 # either slot is not good
+or r7 r3 r6 # stop if both are empty or either is not good
+bnez r7 stopFiltering
+l r0 Self Setting
+beqz r0 startFiltering
+j loop
 
-load:
-l unfilteredPressure db PressureInput
-l filteredPressure db PressureOutput
-sge overPressure filteredPressure PressureMax
-or venting overPressure venting
-sge r0 filteredPressure VentTo
-and venting r0 venting
-move badFilter 0
-move unfilteredRatio 0
-blez unfilteredPressure ra
-move filterNumber 0
-push ra
-jal loadRatio
-pop ra
-bgtz unfilteredRatio ra
-move filterNumber 1
-push ra
-jal loadRatio
-pop ra
-j ra
+stopFiltering:
+s Self Mode 0
+j loop
 
-loadRatio:
-ls r0 db filterNumber Quantity
-blez r0 setBadFilter
-ls r0 db filterNumber PrefabHash
-beq r0 632853248 checkNitrogen
-beq r0 -632657357 checkNitrogen
-beq r0 -1387439451 checkNitrogen
-beq r0 -721824748 checkOxygen
-beq r0 -1067319543 checkOxygen
-beq r0 -1217998945 checkOxygen
-beq r0 15011598 checkVolatiles
-beq r0 1255156286 checkVolatiles
-beq r0 1037507240 checkVolatiles
-beq r0 1635000764 checkCarbonDioxide
-beq r0 416897318 checkCarbonDioxide
-beq r0 1876847024 checkCarbonDioxide
-beq r0 -1247674305 checkNitrous
-beq r0 1824284061 checkNitrous
-beq r0 465267979 checkNitrous
-beq r0 1915566057 checkPollutants
-beq r0 1959564765 checkPollutants
-beq r0 63677771 checkPollutants
-setBadFilter:
-move badFilter 1
+startFiltering:
+s Self Mode 1
+j loop
+
+checkFilterSlot: # args: SlotNum
+# return: isOk on ReturnValue,
+# -1 is ignore, 0 is stop, 1 is fine
+ls r0 Self SlotNum Occupied
+select ReturnValue r0 0 -1 # ignore empty slots
+beqz r0 ra
+ls r0 Self SlotNum Quantity
+move ReturnValue 0 # stop if filter is used up
+beqz r0 ra
+ls r0 Self SlotNum OccupantHash
+move sp MaxSP
+pop r2 # gas logic type
+move r4 0
+loopFilters:
+pop r3 # filter hash
+seq r1 r0 rr4
+beqz r1 foundFilter
+add r4 r4 1
+blt r4 FILTERS_EACH loopFilters
+move ReturnValue 0 # new filter type?
 j ra
-checkNitrogen:
-l unfilteredRatio db RatioNitrogenInput
-j ra
-checkOxygen:
-l unfilteredRatio db RatioOxygenInput
-j ra
-checkVolatiles:
-l unfilteredRatio db RatioVolatilesInput
-j ra
-checkCarbonDioxide:
-l unfilteredRatio db RatioCarbonDioxideInput
-j ra
-checkNitrous:
-l unfilteredRatio db RatioNitrousOxideInput
-j ra
-checkPollutants:
-l unfilteredRatio db RatioPollutantInput
+foundFilter:
+l r0 Self r2
+seqz ReturnValue r0 # no gas to filter
 j ra
