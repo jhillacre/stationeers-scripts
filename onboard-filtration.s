@@ -27,10 +27,10 @@ push HASH("ItemGasFilterOxygenM")
 push HASH("ItemGasFilterOxygenL")
 push HASH("ItemGasFilterOxygenInfinite")
 push LogicType.RatioOxygenInput
-push HASH("ItemGasFilterPollutant")
-push HASH("ItemGasFilterPollutantM")
-push HASH("ItemGasFilterPollutantL")
-push HASH("ItemGasFilterPollutantInfinite")
+push HASH("ItemGasFilterPollutants")
+push HASH("ItemGasFilterPollutantsM")
+push HASH("ItemGasFilterPollutantsL")
+push HASH("ItemGasFilterPollutantsInfinite")
 push LogicType.RatioPollutantInput
 push HASH("ItemGasFilterVolatiles")
 push HASH("ItemGasFilterVolatilesM")
@@ -65,13 +65,13 @@ move SlotOneStatus ReturnValue
 seq r0 SlotZeroStatus SlotOneStatus # both are equal
 seq r1 SlotZeroStatus -1 # slot 0 is empty
 seq r2 SlotOneStatus -1 # slot 1 is empty
-seq r3 r1 r2 # both are empty
+and r3 r1 r2 # both are empty
 seqz r4 SlotZeroStatus # slot 0 is not good
 seqz r5 SlotOneStatus # slot 1 is not good
 or r6 r4 r5 # either slot is not good
 or r7 r3 r6 # stop if both are empty or either is not good
 bnez r7 stopFiltering
-l r0 Self Setting
+l r0 Self Mode
 beqz r0 startFiltering
 j loop
 
@@ -94,17 +94,21 @@ move ReturnValue 0 # stop if filter is used up
 beqz r0 ra
 ls r0 Self SlotNum OccupantHash
 move sp MaxSP
+loopGasType:
 pop r2 # gas logic type
 move r4 0
 loopFilters:
 pop r3 # filter hash
-seq r1 r0 rr4
-beqz r1 foundFilter
+seq r1 r0 r3
+bnez r1 foundFilter
 add r4 r4 1
 blt r4 FILTERS_EACH loopFilters
+blez sp noMatchedGasType
+j loopGasType
+noMatchedGasType:
 move ReturnValue 0 # new filter type?
 j ra
 foundFilter:
 l r0 Self r2
-seqz ReturnValue r0 # no gas to filter
+sgtz ReturnValue r0 # has gas?
 j ra
