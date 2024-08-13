@@ -1,5 +1,5 @@
 # manage a filtration unit via onboard chip slot
-# stop filtering if pressure is below target
+# stop filtering if filtered pressure is above target
 #  or if both slots are empty or not good
 # start filtering if gas is present that is
 #  our target gas and we have filters to use
