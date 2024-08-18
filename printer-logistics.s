@@ -8,7 +8,6 @@ alias counter r10
 alias ingot r11
 alias oldimport r12
 define CLEARINGOT -1
-define SORTERHASH HASH("StructureSorter")
 define STACKSIZE 36
 setup:
 move sp 0
