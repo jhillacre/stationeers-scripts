@@ -9,13 +9,11 @@ alias ratio r7
 alias maxratio r8
 alias maxindex r9
 
-# if the panels never move...
-# check for new prefab hashs
-define heavy -934345724
-define heavydual -1545574413
-define normal -2045627372
-define normaldual -539224550
-define daylightsensor 1076425094
+define heavy HASH("StructureSolarPanelReinforced")
+define heavydual HASH("StructureSolarPanelDualReinforced")
+define normal HASH("StructureSolarPanel")
+define normaldual HASH("StructureSolarPanelDual")
+define daylightsensor HASH("StructureDaylightSensor")
 
 init:
 move state 6
