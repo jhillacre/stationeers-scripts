@@ -1,12 +1,7 @@
 # Based on Printer Logistics V4 by CowsAreEvil
-# I wanted to not hardcode the hashes and 
-# have digital flip flops as sorters.
-# Succuess on both parts, but the non-hardcoding of hashes
-# would make the script not fit in 128 lines.
-# run printer-logistics-stack.s first, then this, on the same chip
 alias printer d0
 alias stacker d1 # Optional
-alias sorter d2 # Optional, Sorter or DigitalFlipFlop
+alias sorter d2 # Optional
 alias vending d3 # Optional
 alias button d4 # Optional
 alias counter r10
@@ -16,18 +11,46 @@ define CLEARINGOT -1
 define SORTERHASH HASH("StructureSorter")
 define STACKSIZE 36
 setup:
+move sp 0
+push HASH("ItemWaspaloyIngot")
+push HASH("Waspaloy")
+push HASH("ItemStelliteIngot")
+push HASH("Stellite")
+push HASH("ItemInconelIngot")
+push HASH("Inconel")
+push HASH("ItemHastelloyIngot")
+push HASH("Hastelloy")
+push HASH("ItemAstroloyIngot")
+push HASH("Astroloy")
+push HASH("ItemSolderIngot")
+push HASH("Solder")
+push HASH("ItemInvarIngot")
+push HASH("Invar")
+push HASH("ItemElectrumIngot")
+push HASH("Electrum")
+push HASH("ItemConstantanIngot")
+push HASH("Constantan")
+push HASH("ItemSilverIngot")
+push HASH("Silver")
+push HASH("ItemNickelIngot")
+push HASH("Nickel")
+push HASH("ItemLeadIngot")
+push HASH("Lead")
+push 0 # above ingots requested as required
+push 0 # below ingots are kept in stock
+push HASH("ItemSteelIngot")
+push HASH("Steel")
+push HASH("ItemSiliconIngot")
+push HASH("Silicon")
+push HASH("ItemGoldIngot")
+push HASH("Gold")
+push HASH("ItemCopperIngot")
+push HASH("Copper")
+push HASH("ItemIronIngot")
+push HASH("Iron")
 move ingot CLEARINGOT
 s db Setting ingot
 bdns sorter continueSetup
-l r0 sorter PrefabHash
-beq r0 SORTERHASH oldSorterSetup
-newFlipFlopSetup:
-s sorter Mode 0
-s sorter On 0
-s sorter Setting 0
-s sorter SettingOutput 0
-j start
-oldSorterSetup:
 s sorter Mode 2
 s sorter On 1
 continueSetup:
@@ -44,15 +67,6 @@ ls r0 sorter 0 Occupied
 beqz r0 checkIngotArrived
 ls r0 sorter 0 OccupantHash
 seq r0 r0 ingot
-l r1 sorter PrefabHash
-beq r1 SORTERHASH oldSorter
-newFlipFlop: # assume non-sorters are digital flip flop chutes.
-s sorter Mode r0
-s sorter On 1
-yield
-s sorter On 0 # let us react to the next item.
-j checkIngotArrived
-oldSorter:
 s sorter Output r0
 checkIngotArrived:
 l r0 printer ImportCount
