@@ -50,12 +50,10 @@ push HASH("ItemIronIngot")
 push HASH("Iron")
 move ingot CLEARINGOT
 s db Setting ingot
-bdns sorter continueSetup
+bdns sorter start
 s sorter Mode 2
 s sorter On 1
-continueSetup:
 start:
-checkButton:
 bdns button checkCounter
 l r0 button Setting
 beqz r0 checkSorter
