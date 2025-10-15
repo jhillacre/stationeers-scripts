@@ -1,0 +1,62 @@
+alias VP d0 # volume pump
+alias TPA d1 # target pressure analyzer
+alias SPA d2 # source pressure analyzer
+
+define PressureLimit 35000
+define TargetTempLow 292.15
+define TargetTempHigh 298.15
+
+alias PreviousError r15
+alias PreviousSetting r14
+
+define PGain 0.01
+define IGain 0.001
+define DGain 0.001
+
+init:
+bdns VP main
+bdns SPA main
+bdns TPA main
+
+main:
+yield
+s SPA On 1
+s TPA On 1
+# l r0 VP Maximum # unused
+l r1 SPA Pressure
+l r2 SPA Temperature
+l r3 TPA Pressure
+l r4 TPA Temperature
+l r7 VP On
+bge r3 PressureLimit stop
+# prevent constant cycling
+select r7 r7 TargetTempLow TargetTempHigh
+sle r5 r4 r7
+slt r6 r2 r4
+and r5 r5 r6
+bnez r5 stop
+# prevent constant cycling
+select r7 r7 TargetTempHigh TargetTempLow
+sge r5 r4 r7
+sgt r6 r2 r4
+and r5 r5 r6
+bnez r5 stop
+jal pid
+s VP On 1
+s VP Setting PreviousSetting
+j main
+stop:
+s VP On 0
+s VP Setting 0
+j main
+pid: # wipes out r0-r4
+sub r1 PressureLimit r3
+mul r2 r1 PGain
+mul r3 PreviousError IGain
+add r2 r2 r3
+sub r4 r1 PreviousError
+mul r4 r4 DGain
+add r2 r2 r4
+add PreviousSetting PreviousSetting r2
+move PreviousError r1
+j ra
