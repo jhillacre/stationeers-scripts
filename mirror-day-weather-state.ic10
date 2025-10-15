@@ -1,0 +1,19 @@
+alias WeatherStation d0
+alias DaylightSensor d1
+alias IsDay d2
+alias IsStorm d3
+alias StormTime d4
+
+init:
+s db Setting -1
+
+main:
+yield
+l r0 WeatherStation Mode
+l r1 WeatherStation NextWeatherEventTime
+l r2 DaylightSensor Activate
+s IsStorm Setting r0
+s StormTime Setting r1
+s IsDay Setting r2
+s db Setting r1
+j main
