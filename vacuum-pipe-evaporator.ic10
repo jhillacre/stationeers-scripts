@@ -1,0 +1,127 @@
+# D0: Analyzer (target pipe)
+# D1: Liquid Regulator (Setting=L)
+# D2: Purge Valve (kPa target, 0=vac)
+# D3: Logic Switch (kill, optional)
+
+alias A d0
+alias R d1
+alias P d2
+alias K d3
+
+# target fill (permille of pipe volume)
+define FPM 400    # 40%
+# keep gas side bled to vacuum
+define PURGE_SET 0
+# only allow filling if P <= this (kPa)
+define PREFILL_P 10
+
+alias LL r0   # VolumeOfLiquid
+alias LV r1   # Volume
+alias PM r2   # 1000*LL/LV
+alias TL r3   # target litres
+alias ST r4   # -1 kill, 0 fill, 1 vent, 2 init
+alias KS r5   # kill state
+alias PR r6   # Pressure kPa
+alias LV0 r7  # last seen LV
+
+init:
+move ST 2
+move LV0 0
+j L
+
+L:
+yield
+bdns A M
+bdns R M
+bdns P M
+
+# purge always armed
+s P Setting PURGE_SET
+s P On 1
+s P Lock 1
+
+move KS 0
+bdns K SK
+l KS K Open
+SK:
+bnez KS KILL
+
+l LL A VolumeOfLiquid
+l LV A Volume
+l PR A Pressure
+
+# PM (guard LV==0)
+beqz LV Z
+mul PM LL 1000
+div PM PM LV
+j D
+Z:
+move PM 0
+
+# recompute TL when init or LV changed
+D:
+bne LV LV0 RT
+beq ST 2 RT2
+j S
+RT:
+move LV0 LV
+RT2:
+mul TL LV FPM
+div TL TL 1000
+
+S:
+# prefill guard: only fill if P<=PREFILL_P
+ble PR PREFILL_P OK
+# too high: vent (reg off), wait to drop
+j SV
+
+OK:
+# state machine:
+# FILL if empty; VENT if reached target
+beqz LL SF
+bge PM FPM SV
+# else hold last (prefer vent)
+beq ST 1 SV
+j SF
+
+SF:
+# apply FILL only if not already
+beq ST 0 L
+s R Lock 1
+s R Setting TL
+s R On 1
+move ST 0
+j L
+
+SV:
+# apply VENT only if not already
+beq ST 1 L
+s R Lock 1
+s R On 0
+s R Setting 0
+move ST 1
+j L
+
+KILL:
+beq ST -1 L
+# safe-off + unlock regulator; purge stays on
+s R On 0
+s R Setting 0
+s R Lock 0
+move ST -1
+j L
+
+M:
+# missing req device(s): safe-off what we can
+bdns R MR
+s R On 0
+s R Setting 0
+s R Lock 0
+MR:
+# keep P off if P missing; else keep purge on
+bdns P MP
+s P On 1
+s P Lock 1
+MP:
+move ST -1
+j L
