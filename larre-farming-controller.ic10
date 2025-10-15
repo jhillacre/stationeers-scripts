@@ -1,0 +1,123 @@
+alias Arm d0 # Devices
+alias HydroponicDevice d1
+alias Bin1 d2
+alias Bin2 d3
+alias Daylight d4
+alias Growlight d5
+define MinTrayIndex  1 # Globals
+define MaxTrayIndex 34
+define DeviceIndex   1
+define Bin1Index  0
+define Bin2Index 35
+define BinTravelSplit 18
+define LightOn -112.5
+define LightOff 112.5
+alias state r13 # Registers
+alias currentFarm r14
+alias prevFarm r15
+define MOVE 1 # States
+define WAIT 2
+define PICK_FIRST 3
+define PLANT_PREV_ACTIVATE 4
+define PLANT_PREV_CHECK 5
+define PICK_REMAINING_ACTIVATE 6
+define PICK_REMAINING_CHECK 7
+define PLACE_SEND 8
+define PLACE_ACTIVATE 9
+define PLACE_CHECK 10
+define DONE 11
+move currentFarm MinTrayIndex # Init
+move prevFarm MaxTrayIndex
+move state MOVE
+s Arm On 1
+s Bin1 On 1
+s Bin2 On 1
+main:
+yield
+l r0 Daylight Horizontal # Manage Growlight
+sgt r1 r0 LightOn
+slt r2 r0 LightOff
+and r0 r1 r2
+s Growlight On r0
+l r0 Arm Idle
+beqz r0 main
+beq state MOVE caseMove # Switch on state
+beq state WAIT caseWait
+beq state PICK_FIRST casePickFirst
+beq state PLANT_PREV_ACTIVATE casePlantPrevActivate
+beq state PLANT_PREV_CHECK casePlantPrevCheck
+beq state PICK_REMAINING_ACTIVATE casePickRemainingActivate
+beq state PICK_REMAINING_CHECK casePickRemainingCheck
+beq state PLACE_SEND casePlaceSend
+beq state PLACE_ACTIVATE casePlaceActivate
+beq state PLACE_CHECK casePlaceCheck
+beq state DONE caseDone
+j main
+caseMove:
+s Arm Setting currentFarm
+seq r0 currentFarm DeviceIndex
+select state r0 WAIT PICK_FIRST
+j main
+caseWait:
+ls r0 HydroponicDevice 0 Seeding
+blez r0 main
+move state PICK_FIRST
+j main
+casePickFirst:
+l r0 Arm Setting
+s Arm Activate 1
+bne r0 currentFarm main
+s Arm Setting prevFarm
+move state PLANT_PREV_ACTIVATE
+j main
+casePlantPrevActivate:
+s Arm Activate 1
+move state PLANT_PREV_CHECK
+j main
+casePlantPrevCheck:
+ls r0 Arm 0 Quantity
+beqz r0 plantPrevEmpty
+move state PLACE_SEND
+j main
+plantPrevEmpty:
+s Arm Setting currentFarm
+move state PICK_REMAINING_ACTIVATE
+j main
+casePickRemainingActivate:
+s Arm Activate 1
+move state PICK_REMAINING_CHECK
+j main
+casePickRemainingCheck:
+ls r0 Arm 0 Quantity
+select state r0 PLACE_SEND DONE
+j main
+casePlaceSend:
+sle r0 currentFarm BinTravelSplit
+select r0 r0 Bin1Index Bin2Index
+s Arm Setting r0
+move state PLACE_ACTIVATE
+j main
+casePlaceActivate:
+s Arm Activate 1
+move state PLACE_CHECK
+j main
+casePlaceCheck:
+ls r0 Arm 0 Quantity
+beqz r0 placeEmpty
+move state PLACE_ACTIVATE
+j main
+placeEmpty:
+l r0 Arm Setting
+seq r0 r0 Bin1Index
+select r0 r0 2 3
+s dr0 Open 0
+s Arm Setting currentFarm
+move state PICK_REMAINING_ACTIVATE
+j main
+caseDone:
+move prevFarm currentFarm
+add currentFarm currentFarm 1
+sge r0 currentFarm MaxTrayIndex
+select currentFarm r0 MinTrayIndex currentFarm
+move state MOVE
+j main
