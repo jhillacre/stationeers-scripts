@@ -1,0 +1,14 @@
+# Occupancy/Night Lights
+alias OccSen d0
+alias DaylightSen d1
+
+define LightHash HASH("StructureLightLongWide")
+
+loop:
+l r0 d0 Quantity # People
+l r1 d1 Activate # Sunlight
+sgtz r0 r0 # Has People
+slez r1 r1 # Night
+or r2 r0 r1
+sb LightHash On r2
+j loop
