@@ -1,0 +1,118 @@
+# Demonstrates a bug with power distribution and
+# multiple transformers. The bug is that the same
+# power is used by multiple providers to the same
+# source in the same tick. this only triggers
+# when there is a deficit of power, so we need
+# to draw in more than is available. we use
+# large transformers so we can use the seperate
+# data port.
+# Setup:
+# - Two batteries (batt1, batt2)
+# - Two transformers between each battery
+#   (xformer11, xformer12, xformer21, xformer22)
+# - 1 additional transformer between, set to max.
+# - Creates a loop
+# - Make one battery have some charge, and the
+#   other have none to initialize
+# Simulation:
+# - Loop detection burns out cables if all are on
+# - Turning on xformer11 and xformer12 charges
+#   batt2 from batt1
+# - Turning on xformer21 and xformer22 charges
+#   batt1 from batt2
+# - Alternating between the two can charge one
+#   battery to 100% from any starting point other
+#   than 0W
+alias batt1 d0
+# xformer1* sits between batt1 and batt2
+# in parallel
+alias xformer11 d1
+alias xformer12 d2
+alias batt2 d3
+# xformer2* sits between batt2 and batt1
+# in parallel
+alias xformer21 d4
+alias xformer22 d5
+define ONETOTWO 1
+define TWOTOONE 2
+define STOP 3
+define WATTMARGIN 100
+
+s db Setting 0
+
+init:
+yield
+bdns batt1 init
+bdns xformer11 init
+bdns xformer12 init
+bdns batt2 init
+bdns xformer21 init
+bdns xformer22 init
+
+main:
+l r0 batt1 Charge
+l r1 batt2 Charge
+l r2 batt1 Maximum
+l r3 batt2 Maximum
+# If one is full, then done
+sge r4 r0 r2
+sge r5 r1 r3
+or r6 r4 r5
+bnez r6 stop
+# if one is empty, then move to that one
+beqz r0 moveBatt2ToBatt1
+beqz r1 moveBatt1ToBatt2
+# otherwise, we wait
+yield
+j main
+moveBatt1ToBatt2:
+s db Setting ONETOTWO
+s xformer21 Setting 0
+s xformer21 On 0
+s xformer22 Setting 0
+s xformer22 On 0
+yield # Let's be careful here
+l r0 xformer11 Maximum
+l r1 xformer12 Maximum
+div r0 r0 2
+div r1 r1 2
+s xformer11 Setting r0
+s xformer11 On 1
+s xformer12 Setting r1
+s xformer12 On 1
+yield
+j main
+moveBatt2ToBatt1:
+s db Setting TWOTOONE
+s xformer11 Setting 0
+s xformer11 On 0
+s xformer12 Setting 0
+s xformer12 On 0
+yield # Let's be careful here
+l r0 xformer21 Maximum
+l r1 xformer22 Maximum
+div r0 r0 2
+div r1 r1 2
+s xformer21 Setting r0
+s xformer21 On 1
+s xformer22 Setting r0
+s xformer22 On 1
+yield
+j main
+stop:
+s db Setting STOP
+s xformer11 Setting 0
+s xformer11 On 0
+s xformer12 Setting 0
+s xformer12 On 0
+s xformer21 Setting 0
+s xformer21 On 0
+s xformer22 Setting 0
+s xformer22 On 0
+yield
+# If you wanted to use the power
+# you'd then now have to open 'offramp'
+# transformers from the appropriate battery
+# and switch to a mode monitoring the battery
+# to recharge it when it's below some threshold.
+j main
