@@ -1,0 +1,59 @@
+alias IsDay d0
+alias IsStorm d1
+
+define SD HASH("StructureDiode")
+define SDS HASH("StructureDiodeSlide")
+define SFL HASH("StructureFlashingLight")
+define SGL HASH("StructureGlowLight")
+define SGL2 HASH("StructureGlowLight2")
+define SGLS HASH("StructureGlowLightSmall")
+define SLL HASH("StructureLightLong")
+define SLLA HASH("StructureLightLongAngled")
+define SLLW HASH("StructureLightLongWide")
+define SLR HASH("StructureLightRound")
+define SLRA HASH("StructureLightRoundAngled")
+define SLRS HASH("StructureLightRoundSmall")
+define SWL HASH("StructureWallLight")
+define SWLB HASH("StructureWallLightBattery")
+alias MAXSP r15
+move sp 0
+push SD
+push SDS
+push SFL
+push SGL
+push SGL2
+push SGLS
+push SLL
+push SLLA
+push SLLW
+push SLR
+push SLRA
+push SLRS
+push SWL
+push SWLB
+move MAXSP sp
+
+init:
+push 0
+jal setLights
+
+main:
+l r0 IsDay Setting # 1 = day, 0 = night
+l r1 IsStorm Setting # 2 = storm, 1 = imminent, 0 = clear
+seq r2 r1 2
+seqz r3 r0
+or r2 r2 r3
+push r2
+jal setLights
+j main
+
+setLights:
+pop r0
+move sp MAXSP
+setLightsLoop:
+pop r1
+sb r1 On r0
+bnez sp setLightsLoop
+j ra
+
+
