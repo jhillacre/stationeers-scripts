@@ -1,0 +1,112 @@
+# manage a gas fuel generator as backup power
+alias gfg d0 # gas fuel generator
+alias gs d1 # gas sensor
+alias pr_fuel d2 # pressure regulator fuel
+alias pr_coolant d3 # pressure regulator coolant
+alias av_exhaust d4 # active vent exhaust
+alias lockout d5 # lockout switch
+define SB HASH("StructureBattery")
+define SBL HASH("StructureBatteryLarge")
+define LS HASH("StructureLogicSwitch")
+define LOWBATTERY 0.1
+define FULLBATTERY 0.9
+define PRESSURE_TARGET 50 # kPa
+define COOLING_TARGET 293.15 # 20C
+define HEATING_TARGET 328.15 # 55C
+alias make_power r15
+alias exhaust_error r14
+alias coolant_error r13
+alias fuel_error r12
+alias room_temp r11
+init:
+move make_power 1
+move exhaust_error 0
+move coolant_error 0
+move fuel_error 0
+bdns av_exhaust init
+sbn HASH("StructureActiveVent") HASH("AV Intake") Mode 1
+sbn HASH("StructureActiveVent") HASH("AV Intake") PressureInternal 39000
+sbn HASH("StructureActiveVent") HASH("AV Intake") PressureExternal 0
+sbn HASH("StructureActiveVent") HASH("AV Exhaust") Mode 1
+sbn HASH("StructureActiveVent") HASH("AV Exhaust") PressureInternal 50000
+sbn HASH("StructureActiveVent") HASH("AV Exhaust") PressureExternal 101
+main:
+yield
+bdns gfg main
+bdns gs main
+bdns pr_fuel main
+bdns pr_coolant main
+bdns av_exhaust main
+lb r0 SB Charge Sum
+lb r1 SB Maximum Sum
+lb r2 SBL Charge Sum
+lb r3 SBL Maximum Sum
+add r0 r0 r2
+add r1 r1 r3
+div r0 r0 r1
+sle r1 r0 LOWBATTERY
+sge r0 r0 FULLBATTERY
+select make_power r0 0 make_power
+select make_power r1 1 make_power
+l r0 lockout Open
+select make_power r0 make_power 0
+l room_temp gs Temperature
+l r0 pr_coolant Setting
+push r0 # previous setting
+push 0.1 # derivative gain
+push 0.01 # integral gain
+push coolant_error # previous error
+push 0.1 # proportional gain
+push COOLING_TARGET # target value (flipped sign)
+push room_temp # current value (flipped sign)
+jal pid
+pop coolant_error # new error
+pop r0 # new setting
+snez r1 r0
+s pr_coolant On r1
+s pr_coolant Setting r0
+bnez make_power power
+s pr_fuel Setting 0
+s pr_fuel On 0
+s gfg On 0
+move fuel_error 0
+j main
+power:
+l r0 pr_fuel Setting
+push r0 # previous setting
+push 0.1 # derivative gain
+push 0.01 # integral gain
+push fuel_error # previous error
+push 0.1 # proportional gain
+push room_temp # target value
+push HEATING_TARGET # current value
+jal pid
+pop fuel_error # new error
+pop r0 # new setting
+min r0 r0 40000 # pipes make noise above 40MPa
+snez r1 r0
+s pr_fuel On r1
+s pr_fuel Setting r0
+sle r0 room_temp HEATING_TARGET
+and r0 r0 r1
+s gfg On r0
+j main
+pid: # wipes out r0-r4
+pop r1 # target value
+pop r0 # current value
+sub r1 r1 r0
+pop r0 # proportional gain
+mul r2 r1 r0 # proportional
+pop r0 # previous error
+pop r3 # integral gain
+mul r3 r0 r3 # integral
+add r2 r2 r3
+sub r4 r1 r0
+pop r3 # derivative gain
+mul r4 r4 r3 # derivative
+add r2 r2 r4
+pop r0 # previous setting
+add r2 r2 r0
+push r2 # return new setting
+push r1 # return new error
+j ra
