@@ -1,0 +1,125 @@
+# Companion for AIMeE Control System
+# - Sound Klaxon, flip recall switches and close
+#   doors based on weather station warning.
+alias WeatherStation d0
+alias Klaxon d1
+alias RecallSwitch d2
+alias RecallSwitch2 d3
+alias RecallSwitch3 d4
+alias RecallSwitch4 d5
+
+define WS HASH("StructureWeatherStation")
+define KL HASH("StructureKlaxon")
+define HD HASH("StructureAirlockGate")
+define HDM HASH("StructureMediumHangerDoor")
+define HDL HASH("StructureLargeHangerDoor")
+define LT HASH("StructureLogicTransmitter")
+
+alias MY_MODE r15
+alias RS r14 # recall switch device pin number
+
+define RECALL_TIME 300 # 5 minutes
+define CLOSE_TIME 20 # seconds
+define MODE_AWAIT 0
+define MODE_READY 1
+define MODE_RECALLED 2
+define MODE_CLOSED 3
+define MODE_STORM 4
+define WS_IDLE 0
+define WS_WARNING 1
+define WS_STORM 2
+define PS HASH("PlayerSuit")
+
+move MY_MODE MODE_AWAIT
+s db Setting 0
+move RS 2
+bdns Klaxon main
+l r0 Klaxon PrefabHash
+seq r1 r0 KL
+beqz r1 main
+sbn LT PS Volume 80
+l r0 Klaxon Volume
+breq r0 100 2
+s Klaxon Volume 100
+l r0 Klaxon Mode
+breq r0 10 2
+s Klaxon Mode 10
+
+main:
+yield
+l r0 WeatherStation PrefabHash
+seq r1 r0 WS
+beqz r1 main
+l r0 WeatherStation Mode  # 1 = warning, 2 = storm
+l r1 WeatherStation NextWeatherEventTime
+s db Setting r1
+seqz r6 r0 # = WS_IDLE
+seqz r7 MY_MODE # = MODE_AWAIT
+or r6 r6 r7
+bnez r6 main
+seq r6 r0 WS_WARNING
+seq r7 MY_MODE MODE_AWAIT
+and r6 r6 r7
+bnez r6 setReady
+seq r6 r0 WS_STORM
+seq r7 MY_MODE MODE_READY
+and r6 r6 r7
+bnez r6 setStorm
+seq r6 r0 WS_IDLE
+seq r7 MY_MODE MODE_CLOSED
+and r6 r6 r7
+bnez r6 stormPassed
+ble r1 RECALL_TIME checkCloseTime
+beq MY_MODE MODE_RECALLED checkCloseTime
+move MY_MODE MODE_RECALLED
+move RS 2 # count up, push
+flipRecalls:
+jal flipRecall
+add RS RS 1
+blt RS 5 flipRecalls
+checkCloseTime:
+ble r1 CLOSE_TIME main
+beq MY_MODE MODE_CLOSED main
+move MY_MODE MODE_CLOSED
+sb HD Open 1
+sb HDM Open 1
+sb HDL Open 1
+j main
+
+setReady:
+move MY_MODE MODE_READY
+s Klaxon On 1
+sbn LT PS SoundAlert 18
+j main
+
+setStorm:
+move MY_MODE MODE_STORM
+s Klaxon On 0
+j main
+
+stormPassed:
+move MY_MODE MODE_AWAIT
+sb HD Open 0
+sb HDM Open 0
+sb HDL Open 0
+move RS 5 # count down, pop
+unflipRecalls:
+jal unflipRecall
+sub RS RS 1
+bgt RS 1 unflipRecalls
+j main
+
+flipRecall:
+l r0 dr14 Open
+push r0
+bnez r0 ra
+bdns dr14 ra
+s dr14 Open 1
+j ra
+
+unflipRecall:
+pop r0
+beqz r0 ra
+bdns dr14 ra
+s dr14 Open 0
+j ra
