@@ -25,6 +25,7 @@ See [Categories](#categories) for more details.
 | Mature           | Field-tested, minimal issues                |
 | Retired          | Superseded or obsolete                      |
 | Stub             | Documentation placeholder awaiting updates  |
+| Legacy           | Works, but newer mechanics/devices make it risky or outdated |
 
 ## Script Catalog
 
@@ -57,12 +58,12 @@ See [Categories](#categories) for more details.
 | [Power Duplication Bug Controller](scripts/power-duplication-bug.md) | Experimental | Reproduces the transformer duplication exploit to charge batteries from a deficit. |
 | [Printer Logistics (Customized)](scripts/printer-logistics.md) | Mature | Requests ingots for a selected recipe and stops at the stacker limit. |
 | [Storm Recall Controller](scripts/storm-recall-controller.md) | Work in Progress | Automates storm recalls: alarms, switches, and door closures from weather events. |
-| [Room Cooler via Exchange](scripts/room-cooler-via-exchange.md) | Stub | Documentation stub. |
-| [Room Heater via Exchange](scripts/room-heater-via-exchange.md) | Stub | Documentation stub. |
-| [Room Lights](scripts/room-lights.md) | Stub | Documentation stub. |
-| [Temp-Gated Pressure Regulator](scripts/temp-gated-pressure-regulator.md) | Stub | Documentation stub. |
-| [Vacuum Pipe Evaporator](scripts/vacuum-pipe-evaporator.md) | Stub | Documentation stub. |
-| [Water Temperature Control](scripts/water-temp-control.md) | Stub | Documentation stub. |
+| [Room Cooler via Exchange](scripts/room-cooler-via-exchange.md) | Functional | Cycles chilled exchanger gas into a room once it crosses a 22 C trigger. |
+| [Room Heater via Exchange](scripts/room-heater-via-exchange.md) | Functional | Feeds warmed exchanger gas into a room whenever it drops below 20 C. |
+| [Room Lights Controller](scripts/room-lights.md) | Functional | Keeps shared fixtures on when the room is occupied or exterior light is low. |
+| [Temp-Gated Pressure Regulator Controller](scripts/temp-gated-pressure-regulator.md) | Functional | Provides a temperature-safe, low-pressure fuel feed (~350 kPa) via PID pump control. |
+| [Vacuum Pipe Evaporator Controller](scripts/vacuum-pipe-evaporator.md) | Functional | Cycles a purifier manifold between partial fills and vacuum purges for evaporation. |
+| [Water Temperature Control Controller](scripts/water-temp-control.md) | Legacy | Europa-style loop control: opens cold-air valves >=40 C and heats when fluid drops below 30 C; risks freezing with modern phase change. |
 
 ## Categories
 
