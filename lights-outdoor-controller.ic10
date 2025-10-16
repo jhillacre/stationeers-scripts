@@ -39,7 +39,7 @@ jal setLights
 
 main:
 l r0 IsDay Setting # 1 = day, 0 = night
-l r1 IsStorm Setting # 2 = storm, 1 = imminent, 0 = clear
+l r1 IsStorm Setting # 2=storm,1=alert,0=clear
 seq r2 r1 2
 seqz r3 r0
 or r2 r2 r3

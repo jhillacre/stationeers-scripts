@@ -41,7 +41,7 @@ j loop
 
 scaleSetting:
 # wipes out r0, r1, r2, r3, r4, r5, r6, r7
-# args via stack: current value, target value, previous error, previous setting
+# stack args: current, target, prev error, prev set
 # returns via stack: new value, new error
 pop r3 # previous setting
 pop r2 # previous error
@@ -54,7 +54,7 @@ sub r7 r4 r2 # derivative (difference of errors)
 mul r7 r7 0.1 # derivative term (D)
 add r5 r5 r6 # P + I
 add r5 r5 r7 # P + I + D
-add r5 r5 r3 # new setting = previous setting + P + I + D
+add r5 r5 r3 # new setting = prev setting + PID sum
 push r5 # return new setting
 push r4 # return new error
 j ra

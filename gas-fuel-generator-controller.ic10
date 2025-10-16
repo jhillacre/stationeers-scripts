@@ -8,6 +8,9 @@ alias lockout d5 # lockout switch
 define SB HASH("StructureBattery")
 define SBL HASH("StructureBatteryLarge")
 define LS HASH("StructureLogicSwitch")
+define AV -612847057
+define AVIN -1053653914
+define AVOUT 1447285748
 define LOWBATTERY 0.1
 define FULLBATTERY 0.9
 define PRESSURE_TARGET 50 # kPa
@@ -24,12 +27,12 @@ move exhaust_error 0
 move coolant_error 0
 move fuel_error 0
 bdns av_exhaust init
-sbn HASH("StructureActiveVent") HASH("AV Intake") Mode 1
-sbn HASH("StructureActiveVent") HASH("AV Intake") PressureInternal 39000
-sbn HASH("StructureActiveVent") HASH("AV Intake") PressureExternal 0
-sbn HASH("StructureActiveVent") HASH("AV Exhaust") Mode 1
-sbn HASH("StructureActiveVent") HASH("AV Exhaust") PressureInternal 50000
-sbn HASH("StructureActiveVent") HASH("AV Exhaust") PressureExternal 101
+sbn AV AVIN Mode 1
+sbn AV AVIN PressureInternal 39000
+sbn AV AVIN PressureExternal 0
+sbn AV AVOUT Mode 1
+sbn AV AVOUT PressureInternal 50000
+sbn AV AVOUT PressureExternal 101
 main:
 yield
 bdns gfg main

@@ -28,8 +28,8 @@ sb EXTRADHASH Open doCooling
 j continue
 
 day:
-# account for positive/negative angle so the radiator
-# doesn't waste time doing a full-turn on a sign change.
+# adjust sign so the radiator never spins fully
+# avoids a long turn when the sun crosses overhead
 sltz adjustedAngle r3
 mul adjustedAngle adjustedAngle -360
 add adjustedAngle adjustedAngle verticalAngle

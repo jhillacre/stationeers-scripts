@@ -1,5 +1,5 @@
 # manage a filtration unit via onboard chip slot
-# stop filtering if filtered pressure is above target
+# stop filtering when outlet pressure exceeds target
 #  or if both slots are empty or not good
 # start filtering if gas is present that is
 #  our target gas and we have filters to use
@@ -69,7 +69,7 @@ and r3 r1 r2 # both are empty
 seqz r4 SlotZeroStatus # slot 0 is not good
 seqz r5 SlotOneStatus # slot 1 is not good
 or r6 r4 r5 # either slot is not good
-or r7 r3 r6 # stop if both are empty or either is not good
+or r7 r3 r6 # stop if empty or filters invalid
 bnez r7 stopFiltering
 l r0 Self Mode
 beqz r0 startFiltering

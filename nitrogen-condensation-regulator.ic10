@@ -4,7 +4,7 @@
 define LS HASH("StructureLogicSwitch")
 alias CoolingPA d0
 alias ReservePA d1
-alias TVP d2 # point default towards the cooling loop
+alias TVP d2 # default points toward cooling loop
 # Stationeers N is built different
 define NBOILINGTEMP 75
 define NBOILINGPRESSURE 100

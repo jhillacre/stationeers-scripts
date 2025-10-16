@@ -1,4 +1,4 @@
-# display from actual & potential from before batgtery and requried after battery
+# mirror supply actual/potential and load required
 alias cableanalin d0
 alias cableanalout d1
 alias memorya d3

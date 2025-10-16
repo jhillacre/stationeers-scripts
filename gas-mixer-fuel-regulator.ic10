@@ -35,8 +35,8 @@ pressure:
 l r2 fuelsensor RatioVolatiles
 l r3 fuelsensor RatioOxygen
 
-# normalize the ratios to account for contaminants/condensation
-# Mix the gas components as best we can; trust that a filter or some venting will fix the other.
+# normalize ratios to ignore contaminants or ice
+# blend ratios; vents or filters clean the rest
 add r6 r2 r3
 beqz r6 nopressure
 div r2 r2 r6
@@ -44,7 +44,7 @@ div r3 r3 r6
 
 sub r4 H2RATIO r2
 sub r5 O2RATIO r3
-# overcorrect, so it takes less than 10000 MPa to fix.
+# overcorrect so ratio settles quickly
 mul r5 r5 OVERCORRECT
 mul r4 r4 OVERCORRECT
 add r2 H2RATIO r4

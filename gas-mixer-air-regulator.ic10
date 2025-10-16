@@ -36,7 +36,7 @@ l r2 airsensor RatioNitrogen
 l r3 airsensor RatioOxygen
 sub r4 nRATIO r2
 sub r5 O2RATIO r3
-# overcorrect, so it does not take 10000 MPa to fix.
+# overcorrect so ratio settles quickly
 mul r5 r5 OVERCORRECT
 mul r4 r4 OVERCORRECT
 add r2 nRATIO r4

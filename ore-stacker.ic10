@@ -4,10 +4,10 @@
 # This is the experiment that showed that digital
 # flip flop splitters as sorters can't keep up
 # and let items leak under heavy use.
-define SCDFFSR HASH("StructureChuteDigitalFlipFlopSplitterRight")
-define SCDFFSL HASH("StructureChuteDigitalFlipFlopSplitterLeft")
-define SS HASH("StructureStacker")
-define SSR HASH("StructureStackerReverse")
+define SCDFFSR -2099071990
+define SCDFFSL -1412201495
+define SS 1864431457
+define SSR -242959575
 
 alias Lever d0
 alias ThrottleStacker d1

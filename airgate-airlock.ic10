@@ -1,7 +1,7 @@
-# using airgate-set-controller.s and active-vent-set-controller.s,
-#  implement a multi-airgate airlock with many active vents for speed.
-# external and internal sensors should be on seperate networks to
-#  dodge batch reads to inside the airlock sensors, which can be many.
+# use airgate-set-controller with active-vent sets
+# runs a multi-airgate airlock with fast vent banks
+# keep interior/exterior sensors on separate nets
+# avoid big batch reads when many airlock sensors
 # condensed formatting for lines...
 alias doorCommandMemory d0
 alias ventCommandMemory d1
@@ -42,10 +42,10 @@ yield
 lb buttonPushed BUTTON Activate 3
 beqz buttonPushed main
 pressed:
-select r0 openInternal switchToExternal switchToInternal
+select r0 openInternal switchExt switchInt
 jal r0
 j main
-switchToExternal:
+switchExt:
 s doorCommandMemory Setting CLOSEINT
 s ventCommandMemory Setting EXHAUSTINT
 push ra
@@ -60,7 +60,7 @@ sleep DOORSLEEP
 pop ra
 move openInternal 0
 j ra
-switchToInternal:
+switchInt:
 s doorCommandMemory Setting CLOSEEXT
 s ventCommandMemory Setting EXHAUSTEXT
 push ra

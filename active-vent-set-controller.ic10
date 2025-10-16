@@ -1,43 +1,39 @@
-# open or close all network active vents depending on
-#  a vent command setting
-# RespondToInternal should be changed if this active
-#  vent set is considered internal or external.
-# intended use would have a memory / ic housing
-#  mirrored from a controlling network that wants to
-#  command two sets of multiple active vents.
-alias ventCommand d0
-alias externalSensor d1
+# drives a bank of active vents from one command
+# set RESPINT when internal vents are the target
+# mirror a memory to broadcast modes to other banks
+alias ventCmd d0
+alias extSensor d1
 
-define CLEAR 0
-define EXHAUSTEXT 1
-define EXHAUSTINT 2
-define INTAKEEXT 3
-define INTAKEINT 4
-define OFFEXT 5
-define OFFINT 6
-define OFFALL 7
+define CMD_CLEAR 0
+define CMD_EXH_OUT 1
+define CMD_EXH_IN 2
+define CMD_INT_OUT 3
+define CMD_INT_IN 4
+define CMD_OFF_OUT 5
+define CMD_OFF_IN 6
+define CMD_STOP 7
 
 define ACTIVEVENT -1129453144
-define RespondToInternal 0
+define RESPINT 0
 define CLEARCMDSLEEP 0.5
 
-alias doExhaust r8
-alias doIntake r9
+alias doExh r8
+alias doInt r9
 alias doOff r10
 
 init:
 sb ACTIVEVENT Lock 0
-select doExhaust RespondToInternal EXHAUSTINT EXHAUSTEXT
-select doIntake RespondToInternal INTAKEINT INTAKEEXT
-select doOff RespondToInternal OFFINT OFFEXT
+select doExh RESPINT CMD_EXH_IN CMD_EXH_OUT
+select doInt RESPINT CMD_INT_IN CMD_INT_OUT
+select doOff RESPINT CMD_OFF_IN CMD_OFF_OUT
 
 main:
 yield
-l r0 ventCommand Setting
-beq r0 doExhaust exhaust
-beq r0 doIntake intake
+l r0 ventCmd Setting
+beq r0 doExh exhaust
+beq r0 doInt intake
 beq r0 doOff off
-beq r0 OFFALL off
+beq r0 CMD_STOP off
 j main
 
 exhaust:
@@ -52,7 +48,7 @@ intake:
 sb ACTIVEVENT Lock 1
 sb ACTIVEVENT Mode 0
 sb ACTIVEVENT PressureInternal 0
-l r0 externalSensor Pressure
+l r0 extSensor Pressure
 sb ACTIVEVENT PressureExternal r0
 sb ACTIVEVENT On 1
 j clear
@@ -63,5 +59,5 @@ sb ACTIVEVENT Lock 0
 
 clear:
 sleep CLEARCMDSLEEP
-s ventCommand Setting CLEAR
+s ventCmd Setting CMD_CLEAR
 j main

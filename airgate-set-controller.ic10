@@ -1,10 +1,6 @@
-# open or close all network airgates depending on a
-#  door command setting
-# RespondToInternal should be changed if this airgate
-#  set is considered internal or external.
-# intended use would have a memory / ic housing
-#  mirrored from a controlling network that wants
-#  to command two sets of multiple airgates.
+# drives a bank of airgates from a shared command
+# set RESPINT when internal vents are primary
+# mirror a memory to broadcast modes to paired banks
 alias doorCommand d0
 
 define CLEAR 0
@@ -16,7 +12,7 @@ define CLOSEEXT 5
 define CLOSEALL 6
 
 define AIRGATE 1736080881
-define RespondToInternal 1
+define RESPINT 1
 define CLEARCMDSLEEP 0.5
 
 alias doorHash r7
@@ -27,9 +23,9 @@ alias doCloseAll r11
 
 init:
 move doorHash AIRGATE
-select doOpen RespondToInternal OPENINT OPENEXT
+select doOpen RESPINT OPENINT OPENEXT
 move doOpenAll OPENALL
-select doClose RespondToInternal CLOSEINT CLOSEEXT
+select doClose RESPINT CLOSEINT CLOSEEXT
 move doCloseAll CLOSEALL
 
 main:

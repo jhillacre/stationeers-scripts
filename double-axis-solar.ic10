@@ -9,11 +9,11 @@ alias ratio r7
 alias maxratio r8
 alias maxindex r9
 
-define heavy HASH("StructureSolarPanelReinforced")
-define heavydual HASH("StructureSolarPanelDualReinforced")
-define normal HASH("StructureSolarPanel")
-define normaldual HASH("StructureSolarPanelDual")
-define daylightsensor HASH("StructureDaylightSensor")
+define heavy 1318531140
+define heavydual -1103022266
+define normal 1515481583
+define normaldual -720345311
+define daylightsensor 95109990
 
 init:
 move state 6

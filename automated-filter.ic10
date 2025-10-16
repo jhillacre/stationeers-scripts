@@ -15,9 +15,12 @@ alias alarmOn r13
 alias filtrationOn r14
 alias venting r15
 
-define RatioMax 0 # leave under this ratio in the unfiltered side
-define PressureMax 39000 # fill filtered side up to
-define VentTo 38500 # Bigger number for less constant alarm...
+# keep waste ratio under this threshold
+define RatioMax 0
+# maximum storage pressure before shutdown
+define PressureMax 39000
+# vent down to this pressure when dumping
+define VentTo 38500
 
 init:
 bdns filtration init

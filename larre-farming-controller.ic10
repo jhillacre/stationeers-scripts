@@ -18,12 +18,12 @@ alias prevFarm r15
 define MOVE 1 # States
 define WAIT 2
 define PICK_FIRST 3
-define PLANT_PREV_ACTIVATE 4
-define PLANT_PREV_CHECK 5
-define PICK_REMAINING_ACTIVATE 6
-define PICK_REMAINING_CHECK 7
-define PLACE_SEND 8
-define PLACE_ACTIVATE 9
+define PLANT_ACT 4
+define PLANT_CHECK 5
+define PICK_ACT 6
+define PICK_CHECK 7
+define PLACE_QUEUE 8
+define PLACE_ACT 9
 define PLACE_CHECK 10
 define DONE 11
 move currentFarm MinTrayIndex # Init
@@ -44,12 +44,12 @@ beqz r0 main
 beq state MOVE caseMove # Switch on state
 beq state WAIT caseWait
 beq state PICK_FIRST casePickFirst
-beq state PLANT_PREV_ACTIVATE casePlantPrevActivate
-beq state PLANT_PREV_CHECK casePlantPrevCheck
-beq state PICK_REMAINING_ACTIVATE casePickRemainingActivate
-beq state PICK_REMAINING_CHECK casePickRemainingCheck
-beq state PLACE_SEND casePlaceSend
-beq state PLACE_ACTIVATE casePlaceActivate
+beq state PLANT_ACT casePlantAct
+beq state PLANT_CHECK casePlantCheck
+beq state PICK_ACT casePickAct
+beq state PICK_CHECK casePickCheck
+beq state PLACE_QUEUE casePlaceQueue
+beq state PLACE_ACT casePlaceAct
 beq state PLACE_CHECK casePlaceCheck
 beq state DONE caseDone
 j main
@@ -68,36 +68,36 @@ l r0 Arm Setting
 s Arm Activate 1
 bne r0 currentFarm main
 s Arm Setting prevFarm
-move state PLANT_PREV_ACTIVATE
+move state PLANT_ACT
 j main
-casePlantPrevActivate:
+casePlantAct:
 s Arm Activate 1
-move state PLANT_PREV_CHECK
+move state PLANT_CHECK
 j main
-casePlantPrevCheck:
+casePlantCheck:
 ls r0 Arm 0 Quantity
 beqz r0 plantPrevEmpty
-move state PLACE_SEND
+move state PLACE_QUEUE
 j main
 plantPrevEmpty:
 s Arm Setting currentFarm
-move state PICK_REMAINING_ACTIVATE
+move state PICK_ACT
 j main
-casePickRemainingActivate:
+casePickAct:
 s Arm Activate 1
-move state PICK_REMAINING_CHECK
+move state PICK_CHECK
 j main
-casePickRemainingCheck:
+casePickCheck:
 ls r0 Arm 0 Quantity
-select state r0 PLACE_SEND DONE
+select state r0 PLACE_QUEUE DONE
 j main
-casePlaceSend:
+casePlaceQueue:
 sle r0 currentFarm BinTravelSplit
 select r0 r0 Bin1Index Bin2Index
 s Arm Setting r0
 move state PLACE_ACTIVATE
 j main
-casePlaceActivate:
+casePlaceAct:
 s Arm Activate 1
 move state PLACE_CHECK
 j main
@@ -112,7 +112,7 @@ seq r0 r0 Bin1Index
 select r0 r0 2 3
 s dr0 Open 0
 s Arm Setting currentFarm
-move state PICK_REMAINING_ACTIVATE
+move state PICK_ACT
 j main
 caseDone:
 move prevFarm currentFarm
