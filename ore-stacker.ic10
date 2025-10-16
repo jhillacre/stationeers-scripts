@@ -4,10 +4,10 @@
 # This is the experiment that showed that digital
 # flip flop splitters as sorters can't keep up
 # and let items leak under heavy use.
-define SCDFFSR -2099071990
-define SCDFFSL -1412201495
-define SS 1864431457
-define SSR -242959575
+define SCDFFSR 163728359
+define SCDFFSL -810874728
+define SS -2020231820
+define SSR 1585641623
 
 alias Lever d0
 alias ThrottleStacker d1

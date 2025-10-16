@@ -9,11 +9,11 @@ alias ratio r7
 alias maxratio r8
 alias maxindex r9
 
-define heavy 1318531140
-define heavydual -1103022266
-define normal 1515481583
-define normaldual -720345311
-define daylightsensor 95109990
+define heavy -934345724
+define heavydual -1545574413
+define normal -2045627372
+define normaldual -539224550
+define daylightsensor 1076425094
 
 init:
 move state 6
