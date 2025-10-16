@@ -12,15 +12,6 @@ Keeps a liquid cooling loop in the 30-40 C range by opening exterior cooling val
 | Liquid Pipe Valve | Any | Optional | Opens to route loop fluid through exterior radiators or cold plumbing. |
 | Liquid Pipe Heater | Any | Optional | Injects heat into the loop when the fluid is below the cold threshold. |
 
-## Device Labeling
-Not required. The script uses network-wide batch writes to target all connected valves and heaters of the specified types.
-
-## Screws
-Not used. The controller operates entirely through batch hashes.
-
-## Stack
-Not used.
-
 ## Batch
 - `liquidpipeanalyzer` targets every liquid pipe analyzer on the network to fetch the average loop temperature and a pressure sample.
 - `liquidpipevalve` opens or closes all liquid pipe valves when the loop overheats (`>= 40 C`) to vent heat through exterior radiators or exchangers.

@@ -11,16 +11,10 @@ Points one or more extendable radiators toward the sun during the day, then park
 | Extendable Radiator | N | Yes | Targets that will be opened, closed, and steered. |
 | Daylight Sensor | 1 | Yes | Supplies sun-tracking angles and an “active” flag. |
 
-## Device Labeling
-None; the script discovers radiators by device hash.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `db` | Host IC housing | Stores the last commanded horizontal angle so other controllers can read it.
-
-## Stack
-Not used.
 
 ## Batch
 - Uses the extendable radiator hash (`-566775170`) to broadcast `Open` and `Horizontal` commands to every radiator on the network.

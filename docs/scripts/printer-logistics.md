@@ -15,10 +15,7 @@ Requests ingots from a vending machine to feed a selected printer, topping up co
 | Button / Important Button |     1 | Optional | Retries requests when the vending machine was empty. |
 | IC Housing + IC10 chip |     1 | Yes | Hosts the controller. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Printer | Reads the active recipe and starts prints. |

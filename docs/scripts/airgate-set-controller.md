@@ -11,16 +11,10 @@ Broadcasts open/close commands to every airgate on the network using a single me
 | Airgate |     N | Yes | Doors that react to the shared command register. |
 | Memory / Logic |     1 | Yes | Provides the `Setting` value that encodes the desired door state. |
 
-## Device Labeling
-None; selection happens by device hash.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Memory or logic register | Receives the encoded door command (`1` open all, `2/3` open side, `4/5` close side, `6` close all). |
-
-## Stack
-Not used.
 
 ## Batch
 - `Airgate` hash (`1736080881`) lets the controller issue `Open` toggles to every connected airgate each cycle.

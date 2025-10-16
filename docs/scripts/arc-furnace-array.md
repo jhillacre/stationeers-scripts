@@ -11,16 +11,10 @@ Scans up to six arc furnaces, starting any unit that has ore waiting while obser
 | Arc Furnace |     <=6 | Yes | Furnaces monitored for cargo and `Idle` state. |
 | Logic Switch |     N | Optional | When any switch is closed, all furnaces stay offline. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0`-`d5` | Arc furnaces | Up to six furnaces to monitor (unused screws can remain unassigned). |
-
-## Stack
-Not used.
 
 ## Batch
 - Polls every `StructureLogicSwitch` on the network via `LeverHash` to confirm the manual lockout is open.

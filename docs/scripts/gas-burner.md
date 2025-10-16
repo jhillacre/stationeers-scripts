@@ -14,10 +14,7 @@ Controls a furnace equipped with hydrogen/oxygen supply and exhaust pumps, keepi
 | Gas Sensor (fuel supply) | 1 | Yes | Measures hydrogen tank pressure/purity. |
 | Gas Sensor (exhaust loop) | 1 | Yes | Monitors backpressure to avoid overfilling the exhaust line. |
 
-## Device Labeling
-None. Orient the volume pumps so fuel mode pushes toward the furnace and exhaust mode pulls away.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Furnace | Exposes activation state and combustion ratios. |
@@ -25,12 +22,6 @@ None. Orient the volume pumps so fuel mode pushes toward the furnace and exhaust
 | `d2` | Exhaust pump | Controls exhaust outflow. |
 | `d3` | Fuel sensor | Supplies pressure data for the fuel source. |
 | `d4` | Exhaust sensor | Supplies exhaust pressure for overpressure detection. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
 
 ## Usage
 1. Wire the furnace, two volume pumps, and both gas sensors to the designated screws.

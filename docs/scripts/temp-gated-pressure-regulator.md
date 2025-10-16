@@ -12,29 +12,15 @@ Feeds a gas burner (or similar consumer) with a steady ~350 kPa fuel supply whil
 | Pipe Analyzer (target) | 1 | Yes | Monitors target pressure and temperature for gating the pump. |
 | Pipe Analyzer (source) | 1 | Yes | Provides source pressure/temperature feedback to throttle the pump. |
 
-## Device Labeling
-| Device Type | Label | Purpose |
-|-------------|-------|---------|
-| Volume Pump | `RegPump` | Keeps the volume pump on `d0`. |
-| Pipe Analyzer | `TargetAnalyzer` | Ensures the target analyzer binds to `d1`. |
-| Pipe Analyzer | `SourceAnalyzer` | Keeps the source analyzer on `d2`. |
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Volume pump | Receives the PID-controlled `Setting` and on/off state. |
 | `d1` | Target analyzer | Supplies target pressure/temperature for gating and PID error. |
 | `d2` | Source analyzer | Supplies source pressure/temperature for the gating checks. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
-
 ## Usage
 1. Pipe the volume pump between the source (d2) storage manifold and the low-pressure target manifold that feeds your burner or consumer, ensuring flow from source to target.
-2. Mount the `TargetAnalyzer` on the destination manifold and the `SourceAnalyzer` on the supply manifold, then wire each device to the designated screws. The script automatically sets all three devices to the `main` logic network during `init`; edit the `bdns` calls if you prefer another network name.
+2. Mount the target analyzer on the destination manifold and the source analyzer on the supply manifold, then wire each device to the designated screws (label them if you need deterministic ordering after reboots). The script automatically sets all three devices to the `main` logic network during `init`; edit the `bdns` calls if you prefer another network name.
 3. Upload the script and start it. The controller idles the pump if the target already meets the `PressureLimit` (default 350 kPa) or if the temperature band checks suggest the manifolds are too far apart in temperature.
 4. Adjust the constants in the script as needed:
    - `PressureLimit` caps the target pressure.

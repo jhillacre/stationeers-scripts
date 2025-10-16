@@ -12,10 +12,7 @@ Toggles exterior lighting based on day/night and storm status provided by upstre
 | Logic Memory (is storm) | 1 | Yes | Provides storm/imminent flag. |
 | Outdoor Lights (various) | N | Yes | Any supported light device hashes to drive. |
 
-## Device Labeling
-No special labeling; the controller scans for a fixed list of light device hashes.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Day memory | Day/night flag (`Setting`). |

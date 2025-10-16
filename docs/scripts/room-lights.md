@@ -12,23 +12,16 @@ Keeps interior lighting on whenever the occupancy sensor reports people nearby o
 | Daylight Sensor | 1 | Yes | Provides a daylight flag so lights stay on through the night. |
 | Structure Light (Long Wide) | Any | Yes | Target fixtures switched in unison by the batch hash. |
 
-## Device Labeling
-Not required. Mount the daylight sensor facing the sky and the occupancy sensor covering the room, then wire them to the assigned screws.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Occupancy sensor | Reads `Quantity` to determine if anyone is present. |
 | `d1` | Daylight sensor | Reads `Activate`; becomes zero at night to trigger lighting. |
-
-## Stack
-Not used.
-
 ## Batch
 - `LightHash` defaults to `HASH("StructureLightLongWide")` and turns every matching fixture on or off together. Change the hash if you prefer a different light variant or a named device.
 
 ## Usage
-1. Wire the occupancy sensor to `d0` and the daylight sensor to `d1` on the circuit board running the script.
+1. Wire the occupancy sensor to `d0` and the daylight sensor to `d1`, mounting the daylight sensor with sky exposure and the occupancy sensor covering the room.
 2. Ensure the lights you want to control match the `LightHash` constant (edit the script if you use a different fixture or label).
 3. Upload the script and start it. The lights turn on whenever the room is occupied or the daylight sensor reports night, and turn off only when the area is empty and daylight is available.
 

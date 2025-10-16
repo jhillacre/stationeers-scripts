@@ -13,10 +13,7 @@ Coordinates a bank of active vents to clear, exhaust, intake, or shut down based
 | Memory / Logic |     1 | Yes | Provides the `Setting` value that encodes the command. |
 | Gas Sensor |     1 | Optional  | Samples ambient pressure for intake operations. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Memory or logic register | Selects the command to apply (`0` clear, `1-7` modes). |

@@ -13,22 +13,13 @@ Automates an atmospheric filter, only running it when the intake mix is short on
 | Gas Sensor (output) |     1 | Yes | Monitors filtered output pressure. |
 | Alarm |     1 | Optional | Warns when the filter output is over-pressured. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Atmospheric filter | Toggles the filter on or off. |
 | `d1` | Intake sensor | Provides intake pressure and oxygen ratio. |
 | `d2` | Output sensor | Provides filtered-output pressure. |
 | `d3` | Alarm | Sounds when output pressure exceeds the safe limit. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
 
 ## Usage
 1. Connect the intake gas sensor to the filter’s feed line and wire it to `d1`.

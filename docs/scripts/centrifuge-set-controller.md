@@ -12,10 +12,7 @@ Assuming a steady supply of dirty ore, empties any centrifuge on the network as 
 | Lever |     1 | Yes | Acts as a manual lockout for the array. |
 | IC Housing + IC10 chip |     1 | Yes | Hosts and powers the controller. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Lever | Open to enable dumping; closed to pause the array. |

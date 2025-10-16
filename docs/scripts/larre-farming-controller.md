@@ -15,10 +15,7 @@ Automates a Linear Articulated Rail Entity (LArRE) arm to harvest, replant, and 
 | Daylight Sensor | 1 | Yes | Provides arm heading to infer daylight for grow-light control. |
 | Grow Light | 1 | Optional | Switched on/off based on daylight sensor readings. |
 
-## Device Labeling
-Number the hydroponic device slots consecutively so the arm indices (`MinTrayIndex`…`MaxTrayIndex`) map correctly. Label bins if the arm expects specific slot names.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | LArRE arm | Controls arm `Setting` and `Activate` commands. |
@@ -27,15 +24,11 @@ Number the hydroponic device slots consecutively so the arm indices (`MinTrayInd
 | `d3` | Bin 2 | Receives harvest from late trays. |
 | `d4` | Daylight sensor | Supplies `Horizontal` heading for grow-light logic. |
 | `d5` | Grow light | Toggled based on daylight sensor angle. |
-
-## Stack
-Not used; state is stored in registers and device settings.
-
 ## Batch
 - Relies on the arm’s internal tray index and quantity checks.
 
 ## Usage
-1. Configure `MinTrayIndex`, `MaxTrayIndex`, `DeviceIndex`, `Bin1Index`, and `Bin2Index` to match the LArRE rail layout.
+1. Configure `MinTrayIndex`, `MaxTrayIndex`, `DeviceIndex`, `Bin1Index`, and `Bin2Index` to match the LArRE rail layout; ensure trays and bin slots follow the expected numbering.
 2. Connect the arm, hydroponic device, bins, daylight sensor, and optional grow light to the designated screws.
 3. Start the script. It cycles through the trays, executing the following phases:
    - **MOVE**: Position the arm at the current tray and determine whether it is a tray or staging bin.

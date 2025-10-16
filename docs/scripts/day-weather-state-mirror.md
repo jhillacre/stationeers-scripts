@@ -14,10 +14,7 @@ Mirrors day/night and storm status from weather instrumentation into logic memor
 | Memory (is storm) | 1 | Yes | Receives storm/clear flag. |
 | Memory (storm time) | 1 | Yes | Stores time until the next weather event. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Weather station | Source of `Mode` (storm flag) and `NextWeatherEventTime`. |
@@ -25,12 +22,6 @@ None.
 | `d2` | Memory | Stores day/night flag (`Setting`). |
 | `d3` | Memory | Stores storm mode (`Setting`). |
 | `d4` | Memory | Stores next weather event time (`Setting`). |
-
-## Stack
-Not used.
-
-## Batch
-Not used; each device is accessed directly.
 
 ## Usage
 1. Wire the weather station to `d0`, the daylight sensor to `d1`, and three logic memories to `d2`–`d4`.

@@ -15,10 +15,7 @@ Reproduces the transformer duplication bug where parallel transformers pull the 
 | Transformer (xformer21) | 1 | Yes | Parallel path from batt2 to batt1. |
 | Transformer (xformer22) | 1 | Yes | Parallel path from batt2 to batt1. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Battery 1 | Provides current charge and maximum capacity. |
@@ -27,13 +24,6 @@ None.
 | `d3` | Battery 2 | Provides charge and maximum capacity. |
 | `d4` | Transformer 21 | Drive settings from batt2 to batt1. |
 | `d5` | Transformer 22 | Duplicate path from batt2 to batt1. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
-
 ## Usage
 1. Wire the components in a loop so batt1 and batt2 can feed each other via two parallel transformers per direction. Pre-charge one battery slightly, leave the other empty.
 2. Start the script. It alternates between the two transformer pairs:

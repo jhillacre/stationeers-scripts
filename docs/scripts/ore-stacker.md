@@ -14,10 +14,7 @@ Attempts to route ore automatically into stackers using digital flip-flop splitt
 | Digital Flip-Flop Splitter (Left/Right) | N | Yes | Acts as a programmable chute splitter for each ore type. |
 | Throttle Stacker / Chute Gate | 1 | Yes | Allows one item at a time into the sorter loop. |
 
-## Device Labeling
-Label each flip-flop splitter with the ore hash it should detect and use consistent naming so the IC can address them.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Lever | Pauses automation when closed. |
@@ -32,7 +29,7 @@ Stores the list of ore item hashes to iterate through when scanning the chute ne
 
 ## Usage
 1. Wire the lever to `d0` and the throttle stacker / chute gate to `d1`.
-2. Configure the chute network: create pairs of left/right digital flip-flop splitters for each ore and connect them to stackers.
+2. Configure the chute network: create pairs of left/right digital flip-flop splitters for each ore, labeling them consistently so the IC can address them, and connect the splitters to stackers.
 3. Start the script. In each cycle it:
    - Pulses the throttle stacker to allow a single item into the sorter.
    - Skips work if the lever is closed.

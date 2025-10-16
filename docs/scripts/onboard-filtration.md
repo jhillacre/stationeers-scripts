@@ -10,10 +10,7 @@ Runs directly inside an atmospheric filter’s onboard chip slot, automatically 
 |-------------|------:|-----------|---------|
 | Atmospheric Filter (with onboard IC slot) | 1 | Yes | Hosts the script and processes gases. |
 
-## Device Labeling
-No external wiring is required; install the IC10 chip in the target filter’s onboard slot.
-
-## Screws
+## Device Registers
 None. The script uses the implicit `db` reference (`Self`) to control the host filter.
 
 ## Stack

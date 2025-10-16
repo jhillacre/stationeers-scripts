@@ -13,32 +13,17 @@ Cycles chilled loop gas into an occupied room whenever the room temperature drif
 | Pipe Analyzer (exchanger buffer) | 1 | Yes | Confirms the buffer starts empty and caps buffer pressure at 5 MPa. |
 | Gas Sensor (room) | 1 | Yes | Watches the conditioned room for temperature and pressure. |
 
-## Device Labeling
-| Device Type | Label | Purpose |
-|-------------|-------|---------|
-| Volume Pump | `CoolPumpIn` | Keep devices ordered so `d0` is the intake pump. |
-| Volume Pump | `CoolPumpOut` | Ensures the purge pump binds to `d1`. |
-| Pipe Analyzer | `CoolBuffer` | Attach to the exchanger/manifold you chill between cycles. |
-| Gas Sensor | `RoomSensor` | Mount in the room being cooled; becomes `d3`. |
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Intake pump | Runs while cooling to draw chilled gas toward the room. |
 | `d1` | Purge pump | Runs while idle to evacuate the exchanger buffer. |
 | `d2` | Buffer analyzer | Provides pressure/temperature feedback for the chilled side. |
 | `d3` | Room sensor | Drives the temperature checks that start/stop the cycle. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
-
 ## Usage
 1. Plumb the intake pump from the chilled exchanger buffer toward the room and the purge pump from the buffer back toward your chiller or waste line.
 2. Place the `CoolBuffer` pipe analyzer on the exchanger side and the `RoomSensor` gas sensor inside the room you want to cool. Power both sensors; the script toggles their `On` state during init.
-3. Link the two pumps and both sensors/analyzers to the logic reader so they appear as `d0`–`d3` in the order shown above (use labels to lock the order if your setup reboots often).
+3. Link the two pumps and both sensors/analyzers to the logic reader so they appear as `d0`–`d3` in the order shown above; label devices if you need deterministic ordering after reboots.
 4. Optionally retune the constants near the top of the IC10 file: `TARGET` (21 C), `TOOWARM` (22 C trigger), and `MAXCOOLPRESSURE` (5 MPa buffer cap). `SAMPLEPRESSURE` is reserved for future sampling logic.
 5. Start the script. It idles with the purge pump running until the buffer is empty and the room has pressure, then waits until the room exceeds `TOOWARM`. Once triggered it runs the intake pump until the room cools back to `TARGET` or the buffer reaches the pressure limit, then returns to purge.
 

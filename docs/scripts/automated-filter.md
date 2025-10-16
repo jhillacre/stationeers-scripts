@@ -15,10 +15,7 @@ Automates a single atmospheric filter by selecting the active cartridge, stoppin
 | Alarm |     1 | Optional | Audible indicator under the same conditions. |
 | Active Vent |     1 | Optional | Emergency vent that relieves filtered-side over-pressure. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Atmospheric filter | Enables or disables the filtration unit. |
@@ -27,9 +24,6 @@ None.
 | `d3` | Light | Illuminates during alarms or venting. |
 | `d4` | Alarm | Sounds during alarms or venting. |
 | `d5` | Active vent | Dumps filtered gas when pressure exceeds the threshold. |
-
-## Stack
-Not used.
 
 ## Batch
 - Scans both filter slots to determine which cartridge is installed and match it to the incoming gas species.

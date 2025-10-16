@@ -12,10 +12,7 @@ Blends nitrogen and oxygen into a target atmosphere using two supply pumps, corr
 | Pump |     2 | Yes | Meters nitrogen and oxygen flow into the mixing volume. |
 | Lever / Switch |     1 | Optional | Acts as a manual stop; open disables both pumps. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Mixed-atmosphere gas sensor | Provides pressure and gas ratios for the controlled volume. |
@@ -24,12 +21,6 @@ None.
 | `d3` | Nitrogen pump | Delivers nitrogen toward the mixed tank. |
 | `d4` | Oxygen pump | Delivers oxygen toward the mixed tank. |
 | `d5` | Lever or switch | When open, shuts both pumps off; closed allows mixing. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
 
 ## Usage
 1. Mount the three gas sensors so `d0` reads the destination tank, `d1` the nitrogen source, and `d2` the oxygen source.

@@ -12,10 +12,7 @@ Copies live cable analyzer readings into memory registers so other controllers c
 | Cable Analyzer (load) |     1 | Yes | Provides `PowerRequired` readings downstream of the battery. |
 | Memory |     3 | Yes | Mirrors actual, potential, and required power values for other scripts. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Source analyzer | Supplies actual power draw. |
@@ -23,13 +20,6 @@ None.
 | `d3` | Memory A | Stores actual power (`Setting`). |
 | `d4` | Memory P | Stores potential power. |
 | `d5` | Memory R | Stores required power. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
-
 ## Usage
 1. Wire the upstream cable analyzer (before the battery) to `d0` and the downstream analyzer (after the battery) to `d1`.
 2. Attach three memory chips to `d3`, `d4`, and `d5` for the mirrored values.

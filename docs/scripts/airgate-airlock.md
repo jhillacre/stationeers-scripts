@@ -17,19 +17,13 @@ Coordinates a multi-door airlock using paired airgate and active-vent controller
 | Airgate Bank |     N | External | Doors driven by `airgate-set-controller`. |
 | Active Vent Bank |     N | External | Vents managed by `active-vent-set-controller`. |
 
-## Device Labeling
-None; control happens via shared command memories.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Door command memory | Publishes door codes (`OPEN/CLOSE` variants). |
 | `d1` | Vent command memory | Publishes vent mode codes. |
 | `d2` | Internal sensor mirror | Provides reference metrics for interior atmosphere. |
 | `d3` | External sensor mirror | Provides reference metrics for exterior atmosphere. |
-
-## Stack
-Not used.
 
 ## Batch
 - Relies on external batch controllers (`airgate-set-controller`, `active-vent-set-controller`) to fan out door/vent commands.

@@ -13,28 +13,13 @@ Restores a cold room to 21 C by pulling heat from a warmed exchanger buffer when
 | Gas Sensor (room) | 1 | Yes | Tracks the room temperature the script regulates. |
 | Pipe Analyzer (exchanger buffer) | 1 | Yes | Guards buffer pressure and reports when the buffer is empty. |
 
-## Device Labeling
-| Device Type | Label | Purpose |
-|-------------|-------|---------|
-| Volume Pump | `WarmPumpIn` | Ensure the intake pump binds to `d1`. |
-| Volume Pump | `WarmPumpOut` | Locks the purge pump to `d2`. |
-| Gas Sensor | `RoomSensor` | Mount inside the room; becomes `d0`. |
-| Pipe Analyzer | `WarmBuffer` | Attach to the warmed exchanger manifold; becomes `d3`. |
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Room sensor | Monitors room temperature/pressure to decide when to run. |
 | `d1` | Intake pump | Runs while heating to deliver warm gas to the room. |
 | `d2` | Purge pump | Runs outside the heating window to empty the buffer. |
 | `d3` | Buffer analyzer | Keeps the exchanger side under 5 MPa and signals when it is evacuated. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
-
 ## Usage
 1. Connect the intake pump so it drives gas from the warmed exchanger buffer into the room and the purge pump so it evacuates the buffer back toward heaters or waste.
 2. Place the `RoomSensor` gas sensor inside the conditioned space and the `WarmBuffer` pipe analyzer on the exchanger side. Power both sensors; the script toggles them on during `init`.

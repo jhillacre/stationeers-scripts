@@ -16,7 +16,7 @@ Keeps a gas-fueled generator on standby whenever base batteries dip below the co
 | Logic Switch | N | Optional | Acts as a manual lockout; closed switches suppress generation. |
 | Active Vents (intake/exhaust) | N | Optional | Script pre-configures vents named `AV Intake` / `AV Exhaust`. |
 
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Gas fuel generator | Exposes telemetry and accepts the `On` control. |
@@ -26,14 +26,9 @@ Keeps a gas-fueled generator on standby whenever base batteries dip below the co
 | `d4` | Exhaust active vent | Relieves exhaust pressure when the chamber is charged. |
 | `d5` | Lockout switch | Manual interlock; when closed, generation is disabled. |
 
-## Stack
-Not used.
-
 ## Batch
 - Aggregates all small (`StructureBattery`) and large (`StructureBatteryLarge`) batteries to compute state of charge.
 - Checks every logic switch (`StructureLogicSwitch`) for lockout state.
-- Optionally reconfigures active vents named `AV Intake` / `AV Exhaust` via `sbn`.
-- Reads temperatures using the onboard gas sensor.
 
 ## Usage
 1. Wire the generator, gas sensor, fuel and coolant regulators, exhaust vent, and lockout switch to their respective screws.

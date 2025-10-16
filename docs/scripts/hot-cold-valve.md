@@ -12,24 +12,17 @@ Maintains a target room temperature by pulsing hot and cold loop valves based on
 | Volume Pump / Valve (cold loop) | 1 | Yes | Injects cold gas or liquid when the room is above target. |
 | Gas Sensor | 1 | Yes | Measures ambient temperature (read via device hash). |
 
-## Device Labeling
-The script finds the gas sensor via hash (`StructureGasSensor`); ensure only one sensor is available on the network.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Hot valve | Pulsed on when the room is colder than `COLDTARGET`. |
 | `d1` | Cold valve | Pulsed on when the room is warmer than `HOTTARGET`. |
-
-## Stack
-Not used.
-
 ## Batch
-- Reads temperature from the first gas sensor on the network. The sensor is not wired to a screw.
+- Reads temperature from the first `StructureGasSensor` hash present on the network; ensure only one ambient sensor is reachable.
 
 ## Usage
 1. Connect the hot and cold valves to `d0` and `d1`.
-2. Place a gas sensor on the same network so the script can read ambient temperature.
+2. Place a gas sensor on the same network so the script can read ambient temperature; leave only one `StructureGasSensor` accessible to avoid ambiguity.
 3. (Optional) Adjust `HOTTARGET`, `COLDTARGET`, and `WARMTARGET` to define the acceptable temperature window.
 4. Run the script; it pulses the appropriate valve for 5 seconds when the room is outside the target band.
 

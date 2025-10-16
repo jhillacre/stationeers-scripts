@@ -13,12 +13,6 @@ Uses a daylight sensor to calibrate azimuth and elevation, then tracks the sun t
 | IC Housing + IC10 chip |     1 | Yes | Hosts and powers the controller. |
 | Area Power Controller |     1 | Optional | Keeps the housing powered overnight. |
 
-## Device Labeling
-None; the script auto-discovers connected panels.
-
-## Screws
-None.
-
 ## Usage
 1. Place the daylight sensor, solar panels, and IC housing on the same data network.
 2. Optionally feed the housing with a small backup battery so it survives the night.

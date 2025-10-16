@@ -15,10 +15,7 @@ Blends hydrogen and oxygen into fuel inside a storage tank by modulating two vol
 | Volume Pump (oxygen) | 1 | Yes | Pushes oxygen toward the fuel tank. |
 | Logic Switch | 1 | Optional | Acts as a manual lockout for both pumps. |
 
-## Device Labeling
-None; assign devices to the screws listed below.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Fuel tank sensor | Provides current fuel ratios and pressure. |
@@ -27,12 +24,6 @@ None; assign devices to the screws listed below.
 | `d3` | Hydrogen pump | Metered hydrogen flow. |
 | `d4` | Oxygen pump | Metered oxygen flow. |
 | `d5` | Switch | Enables or disables mixing. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
 
 ## Usage
 1. Wire the target fuel tank sensor to `d0`, the hydrogen supply sensor to `d1`, and the oxygen supply sensor to `d2`.

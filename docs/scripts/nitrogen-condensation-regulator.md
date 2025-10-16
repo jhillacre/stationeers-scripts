@@ -13,25 +13,18 @@ Keeps a nitrogen condensation loop fed from a reserve manifold while avoiding li
 | Volume Pump | 1 | Yes | Moves nitrogen between the reserve and cooling loop. |
 | Logic Switch | N | Optional | Acts as a safety interlock; any closed switch forces the loop to drain. |
 
-## Device Labeling
-Orient the volume pump so mode `0` pushes from the reserve into the cooling loop and mode `1` pulls back into the reserve.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Cooling-loop pipe analyzer | Supplies loop temperature, pressure, moles, and liquid volume. |
 | `d1` | Reserve pipe analyzer | Supplies reserve temperature, pressure, and moles. |
 | `d2` | Volume pump | Bidirectional flow control between reserve and loop. |
-
-## Stack
-Not used (error terms are kept in registers).
-
 ## Batch
 - Polls every `StructureLogicSwitch` on the network; if any switch is closed the controller enters the drain routine.
 - Uses nitrogen material constants to compute saturation pressure via the Clausius–Clapeyron relation.
 
 ## Usage
-1. Connect the reserve manifold, volume pump, and condensation loop so that pump mode `0` feeds the loop.
+1. Connect the reserve manifold, volume pump, and condensation loop so that pump mode `0` feeds the loop (mode `1` drains back toward the reserve).
 2. Attach pipe analyzers to both networks and wire them to `d0` and `d1`. Wire the pump to `d2`.
 3. Optional: add one or more logic switches to the data network as safety lockouts (closed = drain).
 4. Load the script. When lockouts are open the controller:

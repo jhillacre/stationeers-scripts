@@ -10,7 +10,7 @@ Uses a PID loop to counter the air conditioner’s non-linear setpoint so the ou
 |-------------|------:|-----------|---------|
 | Air Conditioner |     1 | Yes | Provides temperature feedback and accepts the corrected setting. |
 
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `db` | Air conditioner | Full control of the air conditioner’s telemetry and setpoint. |

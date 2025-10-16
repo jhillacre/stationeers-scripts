@@ -84,33 +84,97 @@ Reuse the shared template below when filling in stub details.
 [script-name.ic10](../../script-name.ic10)
 
 ## Purpose
-*Purpose of the script, ideally one sentence.*
+<!-- Summarize in 1–2 lines what the script automates. Avoid control-theory jargon. -->
 
 ## Devices *optional*
-*List of devices used by the script.*
+<!--
+    List of devices used by the script, regardless of method of interaction.
+    DeviceType may also be a class of devices with a certain kind of interface.
+-->
 | Device Name | Count | Required? | Purpose |
 |-------------|------:|-----------|---------|
 | DeviceType  |     # | Yes/No    | Describe the role this device plays. |
 
-## Device Labeling *optional*
-*Any device naming required by the script.*
+## Device Registers *optional*
+<!-- 
+    List of direct device references the housing screws should point to
+    This refers to device registers:
+    - `d0` - `d5` for pins/screws
+    - `db` for referencing the housing device or 'self'
+    Exclude if no direct device references are used.
+-->
+| Register | Device | Purpose |
+|---------:|--------|---------|
+| d0 | DeviceType | What we do with the device. |
+
+## Batch *optional*
+<!--
+    This section is for describing any operations that affect multiple devices at once.
+    This refers to opcodes:
+    - `lb` load batch
+    - `sb` store batch
+    Exclude if these opcodes are not used.
+-->
+- Example: targets every device that matches a specific item hash.
+
+## Labels *optional*
+<!--
+    This section is for describing any labels used by the script.
+    This refers to opcodes:
+    - `lbn` load batch name
+    - `sbn` store batch name
+    - `lbns` load batch name slot
+    - `sbns` store batch name slot
+    Exclude if these opcodes are not used.
+-->
 | Device Type | Label | Purpose |
 |-------------|-------|---------|
 | DeviceType  | Label | Explain how the label is used. |
 
-## Screws *optional*
-*List of screws used by the script, and their purpose.*
-| Register | Device | Purpose |
-|---------:|--------|---------|
-| d0 | DeviceType | What this screw controls. |
+## Slots *optional*
+<!--
+    This section is for describing any operations that read or write device's item slots.
+    This refers to opcodes:
+    - `ls` load slot
+    - `ss` store slot
+    - `lbs` load batch slot
+    - `sbs` store batch slot
+    - `lbns` load batch name slot
+    - `sbns` store batch name slot
+    Exclude if these opcodes are not used.
+-->
+- Example: reads filter's slots 0 and 1 to check filter type and status.
+
+## Reagents / Recipes *optional*
+<!--
+    This section is for describing any operations that query or modify printer contents or recipes.
+    This refers to opcodes:
+    - `lr` load reagent
+    - `sr` store reagent
+    - `rmap` Map a reagent type to its required prefab. (e.g., Iron -> ItemIronIngot on an autolathe).
+    Exclude if these opcodes are not used.
+-->
+- Example: reads printer reagent 0 for iron ingot requirements and queues next recipe.
 
 ## Stack *optional*
-*Describe how the device stack is used, if applicable.*
+<!--
+    This section is for describing any operations that read or write the stack.
+    Stacks live on the chip, not the housing devices.
+    This refers to opcodes / registers:
+    - `sp` stack pointer
+    - `push` to my stack, incrementing sp
+    - `pop` from my stack, decrementing sp
+    - `peek` from my stack, does not change sp
+    - `poke` to arbitrary index in my stack, does not change sp
+    - `get` read from my stack
+    - `getd` read from a device's stack
+    - `put` write to my stack
+    - `putd` write to a device's stack
+    - `clr` clear my stack
+    - `clrd` clear a device's stack
+    Exclude if these opcodes are not used.
+-->
 - Example: stack index 0 holds the active recipe hash.
-
-## Batch *optional*
-*Outline any batch operations that act on groups of devices.*
-- Example: targets every device that matches a specific item hash.
 
 ## Usage
 *Instructions on how to deploy the script.*
@@ -119,7 +183,7 @@ Reuse the shared template below when filling in stub details.
 - Additional considerations or tuning tips.
 
 ## Status
-Experimental / Work in Progress / Functional / Stable / Mature / Retired / Stub
+Experimental / Work in Progress / Functional / Stable / Mature / Retired / Stub / Legacy
 
 ## Credit *optional*
 *If not the original author, credit the source of the idea or code.*

@@ -16,10 +16,7 @@ Keeps a room near target gas ratios and pressure by modulating intake pumps and 
 | Gas Sensor |     1 | Optional | Fallback telemetry if no pipe analyzer is wired. |
 | Pipe Analyzer |     1 | Optional | Primary telemetry source for the room mix. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | CO₂ intake pump | Adjusts carbon dioxide flow into the room. |

@@ -14,19 +14,12 @@ Automates storm response: sounds alarms, flips recall switches, and closes hanga
 | Hangar Door / Airlock Gate | N | Optional | Any hangar or airlock doors to close. |
 | Logic Transmitter (PlayerSuit) | 1 | Optional | Plays the recall sound. |
 
-## Device Labeling
-None.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Weather station | Provides `Mode` (0 idle, 1 warning, 2 storm) and next weather event time. |
 | `d1` | Klaxon | Audible alarm for warnings. |
 | `d2`–`d5` | Recall switches | Sequential switches toggled during recall; count down after storms. |
-
-## Stack
-Not used.
-
 ## Batch
 - Configures hangar/airlock doors via device hashes (`StructureAirlockGate`, `StructureMediumHangerDoor`, `StructureLargeHangerDoor`).
 - Sets klaxon defaults and logic transmitter volume.

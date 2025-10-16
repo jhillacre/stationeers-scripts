@@ -11,24 +11,14 @@ Automatically fills portable tanks or smart canisters from a storage tank, scali
 | Volume Pump | 1 | Yes | Moves gas from the storage tank into the portable tank. |
 | Storage Tank | 1 | Yes | Provides the gas source being dispensed. |
 
-## Device Labeling
-Metal frames are not required. Ensure the pump’s mode pushes toward the portable tank and the storage tank’s slot contains the target item.
-
-## Screws
+## Device Registers
 | Register | Device | Purpose |
 |---------:|--------|---------|
 | `d0` | Volume pump | Controls pump output toward the portable tank. |
 | `d1` | Storage | Provides access to the portable tank slot, pressure, and prefab hash. |
-
-## Stack
-Not used.
-
-## Batch
-Not used.
-
 ## Usage
 1. Place the portable tank or canister into the storage tank’s slot.
-2. Wire the volume pump to `d0` and the storage tank to `d1`.
+2. Wire the volume pump to `d0` and the storage tank to `d1`, confirming the pump pushes toward the portable tank.
 3. Start the script. Each loop it:
    - Waits until the storage slot is occupied.
    - Verifies the item is a smart canister or standard tank (by prefab hash).
