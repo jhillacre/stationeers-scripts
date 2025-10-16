@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ic10-limits
+        name: IC10 line/byte limits
+        entry: uv run python scripts/ic10_limits_check.py
+        language: system
+        files: \.ic10$

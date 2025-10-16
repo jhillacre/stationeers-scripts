@@ -14,3 +14,19 @@ Detailed documentation has moved to the `docs/` directory.
 - Browse the [script catalog](docs/index.md#script-catalog) for statuses and summaries.
 - Review the [status scale](docs/index.md#status-scale) when evaluating maturity.
 - Use the [documentation template](docs/index.md#template) to extend any stub.
+
+## Development
+
+Install the project’s pre-commit hooks to enforce IC10 limits locally:
+
+```bash
+# with pip
+pip install pre-commit
+pre-commit install
+
+# or with uv (https://docs.astral.sh/uv/)
+uv tool install pre-commit
+uv run pre-commit install
+```
+
+The hook entry executes through `uv run`, so ensure the `uv` CLI is installed (via `pip install uv`, `uv tool install uv`, or the standalone installers described in the uv docs).
