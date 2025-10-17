@@ -30,6 +30,7 @@ Automatically fills portable tanks or smart canisters from a storage tank, scali
 - Target pressures are expressed in pascals; `18,000,000 Pa` ≈ `18 MPa` for smart canisters, `9,000,000 Pa` ≈ `9 MPa` for standard tanks.
 - `MAXPUMP` scales the maximum pump speed; reduce it for finer control when the tank is nearly full.
 - The script leaves the pump off whenever the slot is empty or the item type is unsupported.
+- Note: portable tank slot telemetry reports pressure in pascals (Pa), which is why the script compares against Pa constants instead of the kilometre-scaled values used by analyzers.
 
 ## Status
 Functional
