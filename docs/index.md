@@ -64,6 +64,7 @@ See [Categories](#categories) for more details.
 | [Temp-Gated Pressure Regulator Controller](scripts/temp-gated-pressure-regulator.md) | Functional | Provides a temperature-safe, low-pressure fuel feed (~350 kPa) via PID pump control. |
 | [Vacuum Pipe Evaporator Controller](scripts/vacuum-pipe-evaporator.md) | Functional | Cycles a purifier manifold between partial fills and vacuum purges for evaporation. |
 | [Water Temperature Control Controller](scripts/water-temp-control.md) | Legacy | Europa-style loop control: opens cold-air valves >=40 C and heats when fluid drops below 30 C; risks freezing with modern phase change. |
+| [Waste Storage Controller](scripts/waste-storage-controller.md) | Work in Progress | Keeps filtration manifolds pressurized while purging exhaust back to storage. |
 
 ## Categories
 

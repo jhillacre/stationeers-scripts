@@ -1,0 +1,85 @@
+# waste recirculation controller for filters
+alias Waste d0
+alias PumpIn d1
+alias InPA d2
+alias PumpOut d3
+alias OutPA d4
+
+define IN_TARGET 40000
+define IN_LOW 38000
+define STORAGE_MIN 10
+define STORAGE_MAX 55000
+define OUT_HIGH 10
+define OUT_LOW 5
+define PUMP_MAX 100
+
+init:
+s InPA On 1
+s InPA Lock 1
+s PumpIn On 0
+s PumpIn Setting 0
+s PumpIn Lock 1
+s OutPA On 1
+s OutPA Lock 1
+s PumpOut On 0
+s PumpOut Setting 0
+s PumpOut Lock 1
+
+main:
+yield
+bdns Waste safe_off
+bdns PumpIn safe_off
+bdns InPA safe_off
+bdns PumpOut safe_off
+bdns OutPA safe_off
+l r0 Waste Pressure
+l r1 InPA Pressure
+l r2 OutPA Pressure
+# intake management
+sle r6 r0 STORAGE_MIN
+sge r7 r1 IN_TARGET
+or r6 r6 r7
+sge r7 r0 STORAGE_MAX
+or r6 r6 r7
+bnez r6 intake_off
+slt r3 r1 IN_LOW
+sgt r4 r0 STORAGE_MIN
+slt r5 r0 STORAGE_MAX
+and r3 r3 r4
+and r3 r3 r5
+bnez r3 intake_on
+j intake_off
+intake_on:
+s PumpIn Setting PUMP_MAX
+s PumpIn On 1
+j exhaust_logic
+intake_off:
+s PumpIn On 0
+s PumpIn Setting 0
+# exhaust purge
+exhaust_logic:
+sge r6 r0 STORAGE_MAX
+sle r7 r2 OUT_LOW
+or r6 r6 r7
+bnez r6 exhaust_off
+sge r6 r2 OUT_HIGH
+slt r7 r0 STORAGE_MAX
+and r6 r6 r7
+bnez r6 exhaust_on
+j exhaust_off
+exhaust_on:
+s PumpOut Setting PUMP_MAX
+s PumpOut On 1
+j main
+exhaust_off:
+s PumpOut On 0
+s PumpOut Setting 0
+j main
+safe_off:
+s PumpIn On 0
+s PumpIn Setting 0
+s PumpOut On 0
+s PumpOut Setting 0
+s InPA On 1
+s OutPA On 1
+j main
