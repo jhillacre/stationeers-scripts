@@ -4,13 +4,15 @@ alias PumpIn d1
 alias InPA d2
 alias PumpOut d3
 alias OutPA d4
+alias InMax r13
+alias OutMax r14
 
 define IN_TARGET 40000
 define IN_LOW 38000
 define STORAGE_MIN 10
 define STORAGE_MAX 55000
-define OUT_HIGH 10
-define OUT_LOW 5
+define OUT_HIGH 10000
+define OUT_LOW 50
 define PUMP_MAX 100
 
 init:
@@ -24,6 +26,14 @@ s OutPA Lock 1
 s PumpOut On 0
 s PumpOut Setting 0
 s PumpOut Lock 1
+l InMax PumpIn Maximum
+bnez InMax haveInMax
+j safe_off
+haveInMax:
+l OutMax PumpOut Maximum
+bnez OutMax haveOutMax
+j safe_off
+haveOutMax:
 
 main:
 yield
@@ -35,12 +45,14 @@ bdns OutPA safe_off
 l r0 Waste Pressure
 l r1 InPA Pressure
 l r2 OutPA Pressure
+sge r8 r2 OUT_HIGH
 # intake management
 sle r6 r0 STORAGE_MIN
 sge r7 r1 IN_TARGET
 or r6 r6 r7
 sge r7 r0 STORAGE_MAX
 or r6 r6 r7
+or r6 r6 r8
 bnez r6 intake_off
 slt r3 r1 IN_LOW
 sgt r4 r0 STORAGE_MIN
@@ -50,7 +62,7 @@ and r3 r3 r5
 bnez r3 intake_on
 j intake_off
 intake_on:
-s PumpIn Setting PUMP_MAX
+s PumpIn Setting InMax
 s PumpIn On 1
 j exhaust_logic
 intake_off:
@@ -58,17 +70,9 @@ s PumpIn On 0
 s PumpIn Setting 0
 # exhaust purge
 exhaust_logic:
-sge r6 r0 STORAGE_MAX
-sle r7 r2 OUT_LOW
-or r6 r6 r7
+sle r6 r2 OUT_LOW
 bnez r6 exhaust_off
-sge r6 r2 OUT_HIGH
-slt r7 r0 STORAGE_MAX
-and r6 r6 r7
-bnez r6 exhaust_on
-j exhaust_off
-exhaust_on:
-s PumpOut Setting PUMP_MAX
+s PumpOut Setting OutMax
 s PumpOut On 1
 j main
 exhaust_off:

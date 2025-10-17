@@ -34,8 +34,8 @@ Not used.
 5. Start the controller. It will:
    - Run the intake pump whenever stored waste is available and the manifold is below target.
    - Fill the intake manifold until it reaches the operating pressure.
-   - Pause intake when storage is full or the manifold exceeds the setpoint.
-   - Purge the exhaust manifold whenever its pressure rises above the idle threshold.
+   - Pause intake when storage is full, the manifold exceeds the setpoint, or the exhaust side backs up.
+   - Purge the exhaust manifold whenever its pressure rises above the idle threshold, even if storage is near capacity.
 
 ## Notes
 - Additional logic can gate the pumps based on filter availability or cartridge status if you mirror that data onto the network.
@@ -44,6 +44,7 @@ Not used.
 - Pressure safety: in a conflict the controller keeps storage below its cap, even if the exhaust manifold has to absorb the excess.
 - The intake can pause at vacuum; once waste pressure returns the script resumes filling the manifold.
 - All pressure thresholds in the script are expressed in kilopascals (kPa) to match analyzer and tank telemetry.
+- Intake/exhaust pumps respect their configured `Maximum` value, so turbo pumps are supported without retuning `PUMP_MAX`.
 
 ## Status
 Work in Progress
