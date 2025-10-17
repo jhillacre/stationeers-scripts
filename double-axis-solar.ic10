@@ -1,119 +1,128 @@
-alias daylight r0
-alias horiangle r1
-alias vertangle r2
-alias state r3
-alias hrotate r4
-alias hpark r5
-alias vpark r6
-alias ratio r7
-alias maxratio r8
-alias maxindex r9
+# Dual-axis solar tracker using daylight sensor.
+# Wiring: daylight sensor on SENSOR_DAYLIGHT.
+# Panels share the bus across all panel banks.
+# Sweep four offsets; keep best until night.
+# applies that offset until sunset when panels park.
 
-define heavy -934345724
-define heavydual -1545574413
-define normal -2045627372
-define normaldual -539224550
-define daylightsensor 1076425094
+alias daylightLevel r0
+alias sensorHorizontal r1
+alias sensorVertical r2
+alias trackerState r3
+alias horizontalOffset r4
+alias parkHorizontal r5
+alias parkVertical r6
+alias currentRatio r7
+alias bestRatio r8
+alias bestIndex r9
+alias sweepIndex r10
+alias scratch r11
+alias scratch2 r12
 
+define PANEL_REINFORCED -934345724
+define PANEL_DUAL_REINFORCED -1545574413
+define PANEL_STANDARD -2045627372
+define PANEL_DUAL -539224550
+define SENSOR_DAYLIGHT 1076425094
+
+define STATE_WAIT_SUNRISE 0
+define STATE_SWEEP 1
+define STATE_TRACK 2
+
+define SWEEP_STEP 90
+define SWEEP_STEPS 4
+define SETTLE_TICKS 15
+define VERTICAL_OFFSET 90
 init:
-move state 6
-move hrotate 0
-move hpark 0
-move vpark 0
-move ratio 0
-move maxratio 0
-move maxindex 0
+move trackerState STATE_WAIT_SUNRISE
+move horizontalOffset 0
+move parkHorizontal 0
+move parkVertical 0
+move bestRatio 0
+move bestIndex 0
+move sweepIndex 0
 
 main:
-jal loadDevices
-bnez daylight day
-night:
-bnez state day
-move horiangle hpark
-move vertangle vpark
-day:
-beq state 6 waitForDay
-beq state 5 stackHRotateToRatio
-beq state 4 setHRotateByMaxRatio
-beq state 3 waitForNight
-beq state 2 waitForDay
-beq state 1 setPark
-returnToMain:
-jal setDevices
+jal readDaylight
+beqz daylightLevel handleNight
+beq trackerState STATE_WAIT_SUNRISE startSweep
+beq trackerState STATE_SWEEP sweepStep
+jal writePanelOrientation
 j main
 
-stackHRotateToRatio:
-move sp 0
-move maxratio 0
-pushRatio:
-jal loadDevices
-move hrotate sp
-mul hrotate hrotate 90
-jal setDevices
-sleep 15
-lb ratio heavy Ratio Maximum
-max maxratio maxratio ratio
-lb ratio heavydual Ratio Maximum
-max maxratio maxratio ratio
-lb ratio normal Ratio Maximum
-max maxratio maxratio ratio
-lb ratio normaldual Ratio Maximum
-max maxratio maxratio ratio
-push maxratio
-blt sp 4 pushRatio
-sub state state 1
-j returnToMain
+handleNight:
+beq trackerState STATE_TRACK capturePark
+j applyPark
 
-setHRotateByMaxRatio:
-move maxratio 0
-findMax:
-ble sp 0 foundMax
-pop ratio
-max maxratio maxratio ratio
-beq ratio maxratio findMaxSet
-j findMax
-findMaxSet:
-move maxratio ratio
-move maxindex sp
-j findMax
-foundMax:
-mul hrotate maxindex 90
-sub state state 1
-j returnToMain
+capturePark:
+move parkHorizontal sensorHorizontal
+move parkVertical sensorVertical
+move trackerState STATE_WAIT_SUNRISE
+move horizontalOffset 0
 
-waitForNight:
-bgtz daylight returnToMain
-sub state state 1
-j returnToMain
+applyPark:
+move sensorHorizontal parkHorizontal
+move sensorVertical parkVertical
+jal writePanelOrientation
+j main
 
-waitForDay:
-blez daylight returnToMain
-sub state state 1
-j returnToMain
+startSweep:
+move trackerState STATE_SWEEP
+move bestRatio 0
+move bestIndex 0
+move sweepIndex 0
 
-setPark:
-move hpark horiangle
-move vpark vertangle
-sub state state 1
-j returnToMain
+sweepStep:
+blt sweepIndex SWEEP_STEPS sweepInRange
+move trackerState STATE_TRACK
+move scratch bestIndex
+mul scratch scratch SWEEP_STEP
+move horizontalOffset scratch
+jal writePanelOrientation
+j main
 
-loadDevices:
-lb daylight daylightsensor Activate 3
-lb horiangle daylightsensor Horizontal 3
-lb vertangle daylightsensor Vertical 3
+sweepInRange:
+jal readDaylight
+move scratch sweepIndex
+mul scratch scratch SWEEP_STEP
+move horizontalOffset scratch
+jal writePanelOrientation
+sleep SETTLE_TICKS
+jal readPanelMaxRatio
+sgt scratch currentRatio bestRatio
+beqz scratch skipUpdate
+move bestRatio currentRatio
+move bestIndex sweepIndex
+skipUpdate:
+add sweepIndex sweepIndex 1
+j sweepStep
+
+readDaylight:
+lb daylightLevel SENSOR_DAYLIGHT Activate 3
+lb sensorHorizontal SENSOR_DAYLIGHT Horizontal 3
+lb sensorVertical SENSOR_DAYLIGHT Vertical 3
 j ra
 
-setDevices:
-add horiangle horiangle hrotate
-sub vertangle 90 vertangle
-sb heavy Horizontal horiangle
-sb heavy Vertical vertangle
-sb heavydual Horizontal horiangle
-sb heavydual Vertical vertangle
-sb normal Horizontal horiangle
-sb normal Vertical vertangle
-sb normaldual Horizontal horiangle
-sb normaldual Vertical vertangle
-s db Setting state
+writePanelOrientation:
+add scratch sensorHorizontal horizontalOffset
+sub scratch2 VERTICAL_OFFSET sensorVertical
+sb PANEL_REINFORCED Horizontal scratch
+sb PANEL_REINFORCED Vertical scratch2
+sb PANEL_DUAL_REINFORCED Horizontal scratch
+sb PANEL_DUAL_REINFORCED Vertical scratch2
+sb PANEL_STANDARD Horizontal scratch
+sb PANEL_STANDARD Vertical scratch2
+sb PANEL_DUAL Horizontal scratch
+sb PANEL_DUAL Vertical scratch2
+s db Setting trackerState
 yield
+j ra
+
+readPanelMaxRatio:
+lb currentRatio PANEL_REINFORCED Ratio Maximum
+lb scratch PANEL_DUAL_REINFORCED Ratio Maximum
+max currentRatio currentRatio scratch
+lb scratch PANEL_STANDARD Ratio Maximum
+max currentRatio currentRatio scratch
+lb scratch PANEL_DUAL Ratio Maximum
+max currentRatio currentRatio scratch
 j ra
