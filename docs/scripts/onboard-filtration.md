@@ -40,7 +40,7 @@ Used to store filter hash tables by gas type so each slot can be validated again
 - `FILTERS_EACH` defines the number of cartridge hashes per gas in the stack; extend the table if new cartridges are added.
 - Because this script runs onboard, external sensors and vents are unnecessary—use `automated-filter.ic10` if you need full remote control.
 - `Self Mode 0/1` directly toggles the filter; ensure no other script tries to manipulate the same filter concurrently.
-- The optional light and klaxon remain off unless a slot contains a recognized cartridge at zero condition, making it easy to spot spent filters.
+- The optional light and klaxon stay quiet when supply gas runs out; they only fire for empty or spent cartridges.
 
 ## Status
 Work in Progress

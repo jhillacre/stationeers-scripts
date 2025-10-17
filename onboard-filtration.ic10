@@ -1,8 +1,6 @@
 # manage a filtration unit via onboard chip slot
-# stop filtering when outlet pressure exceeds target
-#  or if both slots are empty or not good
-# start filtering if gas is present that is
-#  our target gas and we have filters to use
+# stop filtering when outlet pressure hits the cap.
+# also trigger when filters are missing or spent.
 alias Self db
 alias Light d0
 alias Alarm d1
@@ -51,13 +49,11 @@ push HASH("ItemGasFilterNitrousOxideInfinite")
 push LogicType.RatioNitrousOxideInput
 move MaxSP sp
 s Self Mode 0
-bdns Light initNoLight
+bdns Light skipLightInit
 s Light On 0
-initNoLight:
-bdns Alarm initNoAlarm
+skipLightInit:
+bdns Alarm loop
 s Alarm On 0
-initNoAlarm:
-
 loop:
 yield
 l r0 Self PressureOutput
@@ -70,36 +66,35 @@ move SlotZeroStatus ReturnValue
 move SlotNum 1
 jal checkFilterSlot
 move SlotOneStatus ReturnValue
-seq r0 SlotZeroStatus SlotOneStatus # both are equal
 seq r1 SlotZeroStatus -1 # slot 0 is empty
 seq r2 SlotOneStatus -1 # slot 1 is empty
 and r3 r1 r2 # both are empty
 seqz r4 SlotZeroStatus # slot 0 is not good
 seqz r5 SlotOneStatus # slot 1 is not good
 or r6 r4 r5 # either slot is not good
+seq r4 SlotZeroStatus 2
+seq r5 SlotOneStatus 2
+or r0 r4 r5
 or r7 r3 r6 # stop if empty or filters invalid
-bdns Light loopNoLight
+or r7 r7 r0 # also stop when no target gas remains
+or r6 r6 r3 # raise alert if both slots empty
+bdns Light skipLightRun
 s Light On r6
-loopNoLight:
-bdns Alarm loopNoAlarm
+skipLightRun:
+bdns Alarm skipAlarmRun
 s Alarm On r6
-loopNoAlarm:
+skipAlarmRun:
 bnez r7 stopFiltering
 l r0 Self Mode
 beqz r0 startFiltering
 j loop
-
 stopFiltering:
 s Self Mode 0
 j loop
-
 startFiltering:
 s Self Mode 1
 j loop
-
-checkFilterSlot: # args: SlotNum
-# return: isOk on ReturnValue,
-# -1 is ignore, 0 is stop, 1 is fine
+checkFilterSlot: # slot:-1 empty,0 bad,1 ok,2 no gas
 ls r0 Self SlotNum Occupied
 select ReturnValue r0 0 -1 # ignore empty slots
 beqz r0 ra
@@ -120,9 +115,14 @@ blt r4 FILTERS_EACH loopFilters
 blez sp noMatchedGasType
 j loopGasType
 noMatchedGasType:
-move ReturnValue 0 # new filter type?
+move ReturnValue 0
 j ra
 foundFilter:
 l r0 Self r2
-sgtz ReturnValue r0 # has gas?
+sgtz r4 r0
+move ReturnValue 1
+beqz r4 noGas
+j ra
+noGas:
+move ReturnValue 2
 j ra
