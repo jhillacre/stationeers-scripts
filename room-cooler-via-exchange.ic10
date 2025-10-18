@@ -1,44 +1,123 @@
-alias coolpumpin d0
-alias coolpumpout d1
-alias coolsensor d2
-alias warmsensor d3
-
-define TARGET 294.15
-define TOOWARM 295.15
-define SAMPLEPRESSURE 1000
-define MAXCOOLPRESSURE 5000
-
-init:
-s coolsensor On 1
-s warmsensor On 1
-s coolpumpin Setting 100
-s coolpumpout Setting 100
-
-reset:
-s coolpumpin On 0
-s coolpumpout On 1
-
-waitforreset:
+# ### Cooler-only PID with safety box ###
+# === DEVICES ===
+alias pumpIn d0
+alias pumpOut d1
+alias loopA d2
+alias roomS d3
+alias kill d4 # Open = kill
+# === REGISTERS ===
+alias roomT r0 # room temp K
+alias loopP r1 # loop pressure kPa
+alias loopT r2 # loop temp K
+alias scram r3 # emergency stop
+alias err r4 # error
+alias dem r5 # demand
+alias base r6 # PID base effort
+alias effort r7 # final effort
+alias integ r8 # integral term
+alias last r9 # last demand
+alias dErr r10 # demand delta
+alias scaleP r11 # pressure scale factor
+alias scaleT r12 # temperature scale factor
+alias scale r13 # combined scale factor
+alias tmp r14
+alias tmp2 r15
+# === CONSTANTS ===
+define TT 294.15   # K, room target
+define BAND 0.5    # K, deadband
+define TMIN 254    # K, loop temp floor
+define TMARG 4     # K, feather above floor
+define PSHIGH 2600 # kPa, soft ceiling start
+define PSHARD 5000 # kPa, hard trip ceiling
+define KP 0.2
+define KI 0.02
+define KD 0.1
+define ICLAMP 150
+define ICLAMPN -150
+define PSPAN 600 # = PSHIGH-PSLOW feather span
+init: # ===
+s loopA On 1
+s pumpIn Setting 0
+s pumpOut Setting 0
+s pumpIn On 1
+s pumpOut On 1
+move integ 0
+move last 0
+main: # ===
+move scram 0 # check kill switch
+bdns kill skipKill
+l tmp kill Open
+or scram scram tmp
+# === Locking policy: lock unless scrammed ===
+seq tmp scram 0
+s pumpIn Lock tmp
+s pumpOut Lock tmp
+s loopA  Lock tmp
+skipKill: # === post-scram; after kill handling ===
+l roomT roomS Temperature
+l loopP loopA Pressure
+l loopT loopA Temperature
+l tmp2 loopA VolumeOfLiquid # any liquid?
+snez tmp2 tmp2
+or scram scram tmp2 # liquid = trip
+sub err roomT TT
+sub dem err BAND
+max dem dem 0
+sub dErr dem last
+move last dem
+# === pressure ceiling derate: scaleP in [0..1] ===
+sub tmp PSHIGH loopP
+div scaleP tmp PSPAN
+max scaleP scaleP 0
+min scaleP scaleP 1
+# === temp floor derate: scaleT in [0..1] ===
+sgt tmp2 loopP 0 # gP = loopP>0
+sub tmp loopT TMIN
+div tmp tmp TMARG
+min tmp tmp 1
+max tmp tmp 0
+select scaleT tmp2 tmp 1 # no derate if no gas
+# === combine soft derates ===
+min scale scaleP scaleT # 1=free, 0=clamped
+# === hard trips ===
+slt tmp loopT TMIN
+and tmp tmp tmp2                  # low-T trip only
+sgt tmp2 loopP PSHARD            #   if gas present
+or tmp tmp tmp2
+or tmp tmp scram
+select scale tmp 0 scale      # force clamp on trip
+# === anti-windup: pause/zero state when tripped
+select integ tmp 0 integ
+select last  tmp 0 last
+# === PID step (effort base 0..100) ===
+mul tmp dem scale # gate I by authority
+add integ integ tmp
+min integ integ ICLAMP
+max integ integ ICLAMPN
+mul base dem KP
+mul tmp integ KI
+add base base tmp
+mul tmp dErr KD
+add base base tmp
+max base base 0
+min base base 100
+mul effort base scale # scale effort by authority
+# === Apply pump settings ===
+seq tmp scram 0 # PumpIn: block on scram and vacuum
+sgt tmp2 loopP 0
+and tmp tmp tmp2
+select tmp2 tmp effort 0
+l tmp pumpIn Maximum # scale to pump capacity
+mul tmp2 tmp2 tmp
+div tmp2 tmp2 100
+s pumpIn Setting tmp2
+sub tmp 1 scale # PumpOut: scram=>full purge
+mul tmp tmp 100 #  otherwise derate by authority
+sle tmp2 loopP 0
+select tmp tmp2 0 tmp
+l tmp2 pumpOut Maximum # scale to pump capacity
+mul tmp tmp tmp2
+div tmp tmp 100
+s pumpOut Setting tmp
 yield
-l r0 warmsensor Pressure
-beqz r0 waitforreset
-l r0 coolsensor Pressure
-bnez r0 waitforreset
-s coolpumpout On 0
-
-waitforwork:
-sleep 5
-l r0 warmsensor Temperature
-ble r0 TOOWARM waitforwork
-
-coolfill:
-s coolpumpin On 1
-s coolpumpout On 0
-
-waitforcoolfill:
-yield
-l r0 coolsensor Pressure
-bge r0 MAXCOOLPRESSURE reset
-l r0 warmsensor Temperature
-bgt r0 TARGET waitforcoolfill
-j reset
+j main
